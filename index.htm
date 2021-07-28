@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SAC STEM Schedule Builder</title>
+</head>
+<body>
+
+  <p><strong>Student profile:</strong>
+  </p>
+
+  <p>Major:
+  <select id="selectmajor" onchange="updaterecommendations();">
+  </select>
+  </p>
+
+  <p>Semester:
+  <select id="selectsemester" onchange="updaterecommendations();">
+  </select>
+  </p>
+
+  <p>&nbsp;
+  </p>
+
+  <p><strong>Summary:</strong>
+  </p>
+  <div id="summarydiv">
+  </div>
+
+  <p>&nbsp;
+  </p>
+
+  <p><strong>Recommended courses and available sections:</strong>
+  </p>
+
+  <div id="recommendationsdiv">
+  </div>
+
+  <p>&nbsp;
+  </p>
+
+  <p><strong>Weekly schedule from selected sections, with conflicts shown in <span style="color: red;">red</span></strong>:
+  </p>
+
+  <p>Monday:
+  </p>
+  <div id="schedule0div">
+  </div>
+
+  <p>Tuesday:
+  </p>
+  <div id="schedule1div">
+  </div>
+
+  <p>Wednesday:
+  </p>
+  <div id="schedule2div">
+  </div>
+
+  <p>Thursday:
+  </p>
+  <div id="schedule3div">
+  </div>
+
+  <p>Friday:
+  </p>
+  <div id="schedule4div">
+  </div>
+
+  <p>Saturday:
+  </p>
+  <div id="schedule5div">
+  </div>
+
+  <p>Sunday:
+  </p>
+  <div id="schedule6div">
+  </div>
+
+  <p>&nbsp;
+  </p>
+
+  <p><strong>Section bottlenecks:</strong>
+  </p>
+  <div id="bottleneckdiv">
+  </div>
+
+  <p>&nbsp;
+  </p>
+
+  <p><strong>Course conflicts among all available sections, counting lecture and lab components separately:</strong>
+  </p>
+  <div id="conflictsdiv">
+  </div>
+
+  <p>&nbsp;
+  </p>
+
+  <p>Webpage updated 25&nbsp;January&nbsp;2021.
+  </p>
+
+</body>
+<script>
+
+  // list of majors
+  let majors = [
+  "Engineering",
+  "Biology (UC)",
+  "Biology (CSU)",
+  "Biology (UC or CSU)", // csu biology major who decides after 2nd semester to meet uc recommendations
+  "Chemistry",
+  "Math",
+  "Physics"
+  ];
+
+  // list of semesters
+  let semesters = [
+  "1 (Fall)",
+  "2 (Spring)",
+  "3 (Fall)",
+  "4 (Spring)",
+  "5 (Fall)",
+  "6 (Spring)"
+  ];
+
+  // list of recommended courses for each major and semester
+  // can include multiple options, ex. ["BIOL", 212, 214]
+  // must be in same order as list of majors is in
+  let recommendations = [
+  [ // engineering
+  [ // 1st semester
+  ["MATH", 180],
+  ["CHEM", 219]
+  ], // end 1st semester engineering
+  [ // 2nd semester
+  ["MATH", 185],
+  ["PHYS", 217],
+  ["CHEM", 229]
+  ], // end 2nd semester engineering
+  [ // 3rd semester
+  ["MATH", 280],
+  ["PHYS", 227],
+  ["ENGR", 235]
+  ], // end 3rd semester engineering
+  [ // 4th semester
+  ["MATH", 287],
+  ["PHYS", 237],
+  ["ENGR", 240]
+  ], // end 4th semester engineering
+  [ // 5th semester
+  ], // end 5th semester engineering
+  [ // 6th semester
+  ] // end 6th semester engineering
+  ], // end engineering
+  [ // biology (uc)
+  [ // 1st semester
+  ["CHEM", 219],
+  ["MATH", 180]
+  ], // end 1st semester biology (uc)
+  [ // 2nd semester
+  ["CHEM", 229],
+  ["BIOL", 211],
+  ["MATH", 185]
+  ], // end 2nd semester biology (uc)
+  [ // 3rd semester
+  ["CHEM", 249],
+  ["BIOL", 212, 214],
+  ["PHYS", 210],
+  ["MATH", 219]
+  ], // end 3rd semester biology (uc)
+  [ // 4th semester
+  ["CHEM", 259],
+  ["BIOL", 212, 214],
+  ["PHYS", 211]
+  ], // end 4th semester biology (uc)
+  [ // 5th semester
+  ], // end 5th semester biology (uc)
+  [ // 6th semester
+  ] // end 6th semester biology (uc)
+  ], // end biology (uc)
+  [ // biology (csu)
+  [ // 1st semester
+  ["CHEM", 219],
+  ["MATH", 140]
+  ], // end 1st semester biology (csu)
+  [ // 2nd semester
+  ["CHEM", 229],
+  ["BIOL", 211],
+  ["MATH", 162]
+  ], // end 2nd semester biology (csu)
+  [ // 3rd semester
+  ["CHEM", 249],
+  ["BIOL", 212, 214],
+  ["PHYS", 279]
+  ], // end 3rd semester biology (csu)
+  [ // 4th semester
+  ["CHEM", 259],
+  ["PHYS", 289],
+  ], // end 4th semester biology (csu)
+  [ // 5th semester
+  ], // end 5th semester biology (csu)
+  [ // 6th semester
+  ] // end 6th semester biology (csu)
+  ], // end biology (csu)
+  [ // biology (uc or csu)
+  [ // 1st semester
+  ["CHEM", 219],
+  ["MATH", 140]
+  ], // end 1st semester biology (uc or csu)
+  [ // 2nd semester
+  ["CHEM", 229],
+  ["BIOL", 211],
+  ["MATH", 162]
+  ], // end 2nd semester biology (uc or csu)
+  [ // 3rd semester
+  ["CHEM", 249],
+  ["BIOL", 212, 214],
+  ["MATH", 180]
+  ], // end 3rd semester biology (uc or csu)
+  [ // 4th semester
+  ["CHEM", 259],
+  ["BIOL", 212, 214],
+  ["MATH", 185, 219]
+  ], // end 4th semester biology (uc or csu)
+  [ // 5th semester
+  ["PHYS", 210]
+  ], // end 5th semester biology (uc orcsu)
+  [ // 6th semester
+  ["PHYS", 211]
+  ] // end 6th semester biology (uc or csu)
+  ], // end biology (csu)
+  [ // chemistry
+  [ // 1st semester
+  ["CHEM", 219],
+  ["MATH", 180]
+  ], // end 1st semester chemistry
+  [ // 2nd semester
+  ["CHEM", 229],
+  ["MATH", 185]
+  ], // end 2nd semester chemistry
+  [ // 3rd semester
+  ["CHEM", 249],
+  ["MATH", 180],
+  ["PHYS", 217]
+  ], // end 3rd semester chemistry
+  [ // 4th semester
+  ["CHEM", 259],
+  ["PHYS", 227]
+  ], // end 4th semester chemistry
+  [ // 5th semester
+  ], // end 5th semester chemistry
+  [ // 6th semester
+  ] // end 6th semester chemistry
+  ], // end chemistry
+  [ // math
+  [ // 1st semester
+  ["MATH", 162]
+  ], // end 1st semester math
+  [ // 2nd semester
+  ["MATH", 180]
+  ], // end 2nd semester math
+  [ // 3rd semester
+  ["MATH", 185],
+  ], // end 3rd semester math
+  [ // 4th semester
+  ["MATH", 280]
+  ], // end 4th semester math
+  [ // 5th semester
+  ], // end 5th semester math
+  [ // 6th semester
+  ] // end 6th semester math
+  ], // end math
+  [ // physics
+  [ // 1st semester
+  ["MATH", 180],
+  ["CMPR", 120]
+  ], // end 1st semester physics
+  [ // 2nd semester
+  ["MATH", 185],
+  ["PHYS", 217],
+  ["CMPR", 121]
+  ], // end 2nd semester physics
+  [ // 3rd semester
+  ["MATH", 280],
+  ["PHYS", 227]
+  ], // end 3rd semester physics
+  [ // 4th semester
+  ["MATH", 287],
+  ["PHYS", 237]
+  ], // end 4th semester physics
+  [ // 5th semester
+  ], // end 5th semester physics
+  [ // 6th semester
+  ] // end 6th semester physics
+  ] // end physics
+  ];
+
+  // assign first free index to modified classes
+  function nextindex() {
+    var freeindex = 1;
+    while ((fallclasses.has(freeindex)) ||
+           (springclasses.has(freeindex))) {
+      freeindex++;
+    }
+    return freeindex;
+  }
+
+  // list of all relevant classes
+  // maps from section number to course info
+  // course info: dept, course, day, start, end, day, start, end, etc.
+  // uses fall 2019 and spring 2020 data
+  let fallclasses = new Map();
+  let springclasses = new Map();
+
+  fallclasses.set(71464,["BIOL",212,"MW",1020,1145,"MW",1155,1505]);
+  fallclasses.set(71465,["BIOL",214,"TR",1155,1320,"TR",1340,1650]);
+  fallclasses.set(72116,["CHEM",219,"MW",835,1000,"MW",1020,1330]);
+  fallclasses.set(72115,["CHEM",219,"MW",1020,1145,"MW",700,1010]);
+  fallclasses.set(72117,["CHEM",219,"MW",1340,1505,"MW",1520,1830]);
+  fallclasses.set(72119,["CHEM",219,"TR",1340,1505,"TR",1020,1330]);
+  fallclasses.set(72120,["CHEM",219,"TR",1710,1835,"TR",1900,2210]);
+  fallclasses.set(72118,["CHEM",219,"MW",1710,1835,"MW",1900,2210]);
+  fallclasses.set(72123,["CHEM",249,"MW",835,1000,"MW",1020,1340]);
+  fallclasses.set(72125,["CHEM",249,"TR",835,1000,"TR",1020,1340]);
+  fallclasses.set(72124,["CHEM",249,"MW",1710,1835,"MW",1900,2210]);
+  fallclasses.set(71386,["CMPR",120,"TR",800,935,"TR",935,1005]);
+  fallclasses.set(71385,["CMPR",120,"MW",1020,1155,"MW",1155,1225]);
+  fallclasses.set(71417,["CMPR",120,"MW",1230,1405,"MW",1405,1435]);
+  fallclasses.set(71353,["CMPR",120,"TR",1520,1655,"TR",1655,1725]);
+  fallclasses.set(71351,["CMPR",120,"T",1800,2110,"T",2110,2220]);
+  fallclasses.set(71588,["ENGR",235,"T",1340,1650]);
+  fallclasses.set(72585,["MATH",140,"TR",800,1005]);
+  fallclasses.set(72701,["MATH",140,"F",800,1215,"F",1225,1430]);
+  fallclasses.set(72583,["MATH",140,"S",800,1215]);
+  fallclasses.set(72703,["MATH",140,"S",800,1215,"S",1225,1430]);
+  fallclasses.set(72685,["MATH",140,"MW",835,1040,"MW",1050,1140]);
+  fallclasses.set(72678,["MATH",140,"TR",835,1040,"TR",1050,1140]);
+  fallclasses.set(72693,["MATH",140,"TR",835,1040,"TR",1050,1140]);
+  fallclasses.set(72584,["MATH",140,"MW",1020,1225]);
+  fallclasses.set(72581,["MATH",140,"TR",1020,1225]);
+  fallclasses.set(72687,["MATH",140,"MW",1155,1400,"MW",1410,1500]);
+  fallclasses.set(72695,["MATH",140,"TR",1155,1400,"TR",1410,1500]);
+  fallclasses.set(72586,["MATH",140,"MTWR",1235,1445]);
+  fallclasses.set(72580,["MATH",140,"MW",1235,1440]);
+  fallclasses.set(72705,["MATH",140,"TR",1245,1550,"TR",1600,1720]);
+  fallclasses.set(72689,["MATH",140,"MW",1520,1725,"MW",1735,1825]);
+  fallclasses.set(72681,["MATH",140,"MW",1520,1725,"MW",1735,1825]);
+  fallclasses.set(72579,["MATH",140,"TR",1520,1725]);
+  fallclasses.set(72697,["MATH",140,"TR",1520,1725,"TR",1735,1825]);
+  fallclasses.set(72578,["MATH",140,"MW",1735,1940]);
+  fallclasses.set(72691,["MATH",140,"MW",1840,2045,"MW",2055,2145]);
+  fallclasses.set(72699,["MATH",140,"MW",1840,2045,"TR",2055,2145]);
+  fallclasses.set(72683,["MATH",140,"TR",1840,2045,"TR",2055,2145]);
+  fallclasses.set(72582,["MATH",140,"TR",1900,2105]);
+  fallclasses.set(72600,["MATH",162,"MW",800,1005]);
+  fallclasses.set(72604,["MATH",162,"TR",800,1005]);
+  fallclasses.set(72602,["MATH",162,"TR",1020,1225]);
+  fallclasses.set(72605,["MATH",162,"MTWR",1235,1445]);
+  fallclasses.set(72599,["MATH",162,"MW",1520,1725]);
+  fallclasses.set(72603,["MATH",162,"TR",1735,1940]);
+  fallclasses.set(72601,["MATH",162,"MW",1755,2000]);
+  fallclasses.set(72611,["MATH",180,"MW",800,1005]);
+  fallclasses.set(72617,["MATH",180,"TR",800,1005]);
+  fallclasses.set(72612,["MATH",180,"MW",1020,1225]);
+  fallclasses.set(72618,["MATH",180,"TR",1020,1225]);
+  fallclasses.set(72614,["MATH",180,"MW",1520,1725]);
+  fallclasses.set(72633,["MATH",180,"TR",1530,1735]);
+  fallclasses.set(72616,["MATH",180,"MW",1735,1940]);
+  fallclasses.set(72641,["MATH",185,"MW",800,1005]);
+  fallclasses.set(72642,["MATH",185,"MW",1020,1225]);
+  fallclasses.set(72638,["MATH",185,"TR",1235,1440]);
+  fallclasses.set(72640,["MATH",185,"TR",1950,2155]);
+  fallclasses.set(72707,["MATH",219,"MW",800,1005]);
+  fallclasses.set(72713,["MATH",219,"TR",800,1005]);
+  fallclasses.set(72723,["MATH",219,"TR",800,1005]);
+  fallclasses.set(72828,["MATH",219,"F",800,1215,"F",1225,1430]);
+  fallclasses.set(72719,["MATH",219,"F",800,1215]);
+  fallclasses.set(72790,["MATH",219,"F",800,1215,"F",1225,1430]);
+  fallclasses.set(72721,["MATH",219,"S",800,1215]);
+  fallclasses.set(72793,["MATH",219,"S",800,1215,"S",1225,1430]);
+  fallclasses.set(72814,["MATH",219,"MW",835,1040,"MW",1050,1140]);
+  fallclasses.set(72732,["MATH",219,"MW",835,1040,"MW",1050,1140]);
+  fallclasses.set(72780,["MATH",219,"TR",835,1040,"TR",1050,1140]);
+  fallclasses.set(72802,["MATH",219,"TR",835,1040,"TR",1050,1140]);
+  fallclasses.set(72753,["MATH",219,"TR",835,1040,"TR",1050,1140]);
+  fallclasses.set(72708,["MATH",219,"MW",1020,1225]);
+  fallclasses.set(72795,["MATH",219,"MW",1020,1225,"MW",1235,1325]);
+  fallclasses.set(72714,["MATH",219,"TR",1020,1225]);
+  fallclasses.set(72818,["MATH",219,"MW",1155,1400,"MW",1410,1500]);
+  fallclasses.set(72764,["MATH",219,"MW",1155,1400,"MW",1410,1500]);
+  fallclasses.set(72734,["MATH",219,"MW",1155,1400,"MW",1410,1500]);
+  fallclasses.set(72756,["MATH",219,"TR",1155,1400,"TR",1410,1500]);
+  fallclasses.set(72824,["MATH",219,"TR",1155,1400,"TR",1410,1500]);
+  fallclasses.set(72830,["MATH",219,"MW",1155,1500,"MW",1510,1630]);
+  fallclasses.set(72720,["MATH",219,"F",1230,1645]);
+  fallclasses.set(72709,["MATH",219,"MW",1235,1440]);
+  fallclasses.set(72798,["MATH",219,"MW",1340,1545,"MW",1555,1645]);
+  fallclasses.set(72710,["MATH",219,"MW",1520,1725]);
+  fallclasses.set(72722,["MATH",219,"MW",1520,1725]);
+  fallclasses.set(72736,["MATH",219,"MW",1520,1725,"MW",1735,1825]);
+  fallclasses.set(72808,["MATH",219,"TR",1520,1725,"TR",1735,1825]);
+  fallclasses.set(72782,["MATH",219,"TR",1520,1725,"TR",1735,1825]);
+  fallclasses.set(72826,["MATH",219,"TR",1520,1725,"TR",1735,1825]);
+  fallclasses.set(72716,["MATH",219,"TR",1520,1725]);
+  fallclasses.set(72711,["MATH",219,"MW",1735,1940]);
+  fallclasses.set(73342,["MATH",219,"TR",1735,1940]);
+  fallclasses.set(72739,["MATH",219,"MW",1840,2045,"MW",2055,2145]);
+  fallclasses.set(72821,["MATH",219,"MW",1840,2045,"MW",2055,2145]);
+  fallclasses.set(72771,["MATH",219,"MW",1840,2045,"MW",2055,2145]);
+  fallclasses.set(72759,["MATH",219,"TR",1840,2045,"TR",2055,2145]);
+  fallclasses.set(72726,["MATH",219,"TR",1900,2105]);
+  fallclasses.set(72725,["MATH",219,"MW",1950,2155]);
+  fallclasses.set(72712,["MATH",219,"MW",1950,2155]);
+  fallclasses.set(72724,["MATH",219,"TR",1950,2155]);
+  fallclasses.set(72718,["MATH",219,"TR",1950,2155]);
+  fallclasses.set(72592,["MATH",280,"TR",1245,1450]);
+  fallclasses.set(72591,["MATH",280,"MW",1540,1745]);
+  fallclasses.set(71489,["PHYS",210,"T",1840,2150,"R",1840,2150]);
+  fallclasses.set(71491,["PHYS",210,"T",1840,2150,"R",1520,1830]);
+  fallclasses.set(nextindex(),["PHYS",279,"T",1520,1830,"F",1520,1830]);
+  fallclasses.set(nextindex(),["PHYS",217,"TR",1340,1505,"T",835,1145]);
+  fallclasses.set(nextindex(),["PHYS",217,"TR",1340,1505,"R",835,1145]);
+  fallclasses.set(nextindex(),["PHYS",227,"MW",1340,1505,"M",835,1145]);
+  fallclasses.set(nextindex(),["PHYS",227,"MW",1340,1505,"W",835,1145]);
+
+  springclasses.set(78838,["BIOL",211,"TR",1155,1320,"TR",835,1145]);
+  springclasses.set(78839,["BIOL",211,"TR",1155,1320,"TR",1340,1650]);
+  springclasses.set(78842,["BIOL",212,"MW",1020,1145,"MW",1155,1505]);
+  springclasses.set(78843,["BIOL",214,"TR",1155,1320,"TR",1340,1650]);
+  springclasses.set(78414,["CHEM",229,"TR",835,1000,"MW",1020,1330]);
+  springclasses.set(78415,["CHEM",229,"TR",835,1000,"TR",1020,1330]);
+  springclasses.set(78417,["CHEM",259,"MW",835,1000,"MW",1020,1330]);
+  springclasses.set(78418,["CHEM",259,"TR",835,1000,"TR",1020,1330]);
+  springclasses.set(80008,["CMPR",121,"TR",1020,1145,"TR",1155,1215]);
+  springclasses.set(80009,["CMPR",121,"W",1800,2110,"W",2120,2220]);
+  springclasses.set(80158,["ENGR",240,"W",1020,1330]);
+  springclasses.set(78939,["MATH",162,"MW",800,1005]);
+  springclasses.set(78941,["MATH",162,"TR",800,1005]);
+  springclasses.set(78891,["MATH",162,"MWF",1015,1320]);
+  springclasses.set(78940,["MATH",162,"MW",1020,1225]);
+  springclasses.set(78942,["MATH",162,"TR",1235,1440]);
+  springclasses.set(78943,["MATH",162,"TR",1735,1940]);
+  springclasses.set(78946,["MATH",180,"MW",800,1005]);
+  springclasses.set(78947,["MATH",180,"MW",1020,1225]);
+  springclasses.set(78949,["MATH",180,"TR",1020,1225]);
+  springclasses.set(78950,["MATH",180,"TR",1235,1440]);
+  springclasses.set(78948,["MATH",180,"MW",1735,1940]);
+  springclasses.set(78953,["MATH",185,"MW",800,1005]);
+  springclasses.set(78954,["MATH",185,"MW",1020,1225]);
+  springclasses.set(78956,["MATH",185,"TR",1235,1440]);
+  springclasses.set(78955,["MATH",185,"TR",1950,2155]);
+  springclasses.set(78978,["MATH",219,"TR",800,1005]);
+  springclasses.set(79109,["MATH",219,"F",800,1215,"F",1225,1420]);
+  springclasses.set(79093,["MATH",219,"F",800,1215,"F",1225,1420]);
+  springclasses.set(79097,["MATH",219,"S",800,1215,"S",1225,1420]);
+  springclasses.set(78965,["MATH",219,"MW",800,1005]);
+  springclasses.set(78970,["MATH",219,"TR",800,1005]);
+  springclasses.set(78975,["MATH",219,"F",800,1215]);
+  springclasses.set(78976,["MATH",219,"S",800,1215]);
+  springclasses.set(79099,["MATH",219,"MW",835,1040,"MW",1050,1140]);
+  springclasses.set(79111,["MATH",219,"MW",835,1040,"MW",1050,1140]);
+  springclasses.set(79074,["MATH",219,"TR",835,1040,"TR",1050,1140]);
+  springclasses.set(78966,["MATH",219,"MW",1020,1225]);
+  springclasses.set(79057,["MATH",219,"MW",1020,1225,"MW",1235,1325]);
+  springclasses.set(78971,["MATH",219,"TR",1020,1225]);
+  springclasses.set(79117,["MATH",219,"TR",1020,1225,"TR",1235,1325]);
+  springclasses.set(79101,["MATH",219,"MW",1155,1400,"MW",1410,1500]);
+  springclasses.set(79105,["MATH",219,"TR",1155,1400,"TR",1410,1500]);
+  springclasses.set(79077,["MATH",219,"TR",1155,1400,"TR",1410,1500]);
+  springclasses.set(78967,["MATH",219,"MW",1235,1440]);
+  springclasses.set(78972,["MATH",219,"TR",1235,1440]);
+  springclasses.set(78977,["MATH",219,"MW",1235,1440]);
+  springclasses.set(79070,["MATH",219,"MW",1340,1545,"MW",1555,1645]);
+  springclasses.set(79113,["MATH",219,"MW",1520,1725,"MW",1735,1825]);
+  springclasses.set(78979,["MATH",219,"TR",1520,1725]);
+  springclasses.set(79121,["MATH",219,"TR",1520,1725,"TR",1735,1825]);
+  springclasses.set(79103,["MATH",219,"MW",1520,1725,"MW",1735,1825]);
+  springclasses.set(79079,["MATH",219,"TR",1520,1725,"TR",1735,1825]);
+  springclasses.set(79072,["MATH",219,"MW",1730,1935,"MW",1945,2035]);
+  springclasses.set(78973,["MATH",219,"TR",1735,1940]);
+  springclasses.set(78968,["MATH",219,"MW",1735,1940]);
+  springclasses.set(79119,["MATH",219,"TR",1800,2005,"TR",2015,2105]);
+  springclasses.set(79115,["MATH",219,"MW",1840,2045,"MW",2055,2145]);
+  springclasses.set(79107,["MATH",219,"TR",1840,2045,"TR",2055,2145]);
+  springclasses.set(79089,["MATH",219,"TR",1840,2045,"TR",2055,2145]);
+  springclasses.set(78969,["MATH",219,"MW",1945,2150]);
+  springclasses.set(78974,["MATH",219,"TR",1945,2150]);
+  springclasses.set(78962,["MATH",280,"MW",1235,1440]);
+  springclasses.set(78963,["MATH",280,"TR",1800,2005]);
+  springclasses.set(78964,["MATH",287,"MW",1340,1610]);
+  springclasses.set(nextindex(),["PHYS",289,"T",1520,1830,"F",1520,1830]);
+  springclasses.set(nextindex(),["PHYS",211,"T",1840,2150,"R",1520,1830]);
+  springclasses.set(nextindex(),["PHYS",211,"T",1840,2150,"R",1840,2150]);
+  springclasses.set(nextindex(),["PHYS",217,"MW",1340,1505,"M",835,1145]);
+  springclasses.set(nextindex(),["PHYS",217,"MW",1340,1505,"W",835,1145]);
+  springclasses.set(nextindex(),["PHYS",227,"TR",1340,1505,"T",835,1145]);
+  springclasses.set(nextindex(),["PHYS",227,"TR",1340,1505,"R",835,1145]);
+  springclasses.set(nextindex(),["PHYS",237,"MW",1710,1825,"W",1340,1650]);
+
+  // maps day of week from number (0-6) to letter
+  let dayofweek = new Map();
+  dayofweek.set(0, "M")
+  dayofweek.set(1, "T")
+  dayofweek.set(2, "W")
+  dayofweek.set(3, "R")
+  dayofweek.set(4, "F")
+  dayofweek.set(5, "S")
+  dayofweek.set(6, "U")
+
+  // maps majors (in order of majors array) from name to number, indexed at 0
+  let majorcolumns = new Map();
+  for (let i = 0; i < majors.length; i++) {
+    majorcolumns.set(majors[i], i);
+  }
+
+  // maps semesters (in order of semesters array) from name to number, indexed at 0
+  let semesterrows = new Map();
+  for (let i = 0; i < semesters.length; i++) {
+    semesterrows.set(semesters[i], i);
+  }
+
+  // generates sets of fall semester names, ex. "1 (Fall)", and spring semester names
+  // marked as fall semester if "fall" (not case-sensitive) included in name
+  // otherwise, marked as spring semester
+  let fallsemesters = new Set();
+  let springsemesters = new Set();
+  for (let semestername of semesters) {
+
+    if (semestername.toLowerCase().includes("fall")) {
+
+      fallsemesters.add(semestername);
+
+    } else {
+
+      springsemesters.add(semestername);
+
+    } // if statement
+
+  } // for loop (all semester names)
+
+  // generate a map from semester+dept+course to (unpopulated) set of available sections
+  // set of semester+dept_course keys needs to be maintained separately
+  let coursesections = new Map();
+  var recommendedcoursekeys = new Set();
+  for (let i = 0; i < recommendations.length; i++) {
+    // step through all majors
+
+    for (let j = 0; j < recommendations[i].length; j++) {
+      // for each major (index i), step through all semesters
+
+      for (let k = 0; k < recommendations[i][j].length; k++) {
+        // for major (index i) and semester (index j), step through all courses
+
+        for (let l = 1; l < recommendations[i][j][k].length; l++) {
+          // for course in question (index k), step through all options
+
+          let dept = recommendations[i][j][k][0];
+          let course = recommendations[i][j][k][l];
+          if ((j == 0) || (j == 2)) {
+
+            key = "Fall " + dept + " " + course;
+
+          } else {
+
+            key = "Spring " + dept + " " + course;
+
+          } // if statement
+          coursesections.set(key, new Set());
+          recommendedcoursekeys.add(key);
+
+        } // index l (option)
+
+      } // index k (course)
+
+    } // index j (semester)
+
+  } // index i (major)
+
+  // populate map from semester+dept+course with set of available sections
+  for (let [semestertype, coursesmap] of [["Fall", fallclasses],
+                                          ["Spring", springclasses]]) {
+    for (let [sectionnumber, courseinfo] of coursesmap.entries()) {
+      // steps through all classes offered in the given semester
+
+      var dept = courseinfo[0];
+      var course = courseinfo[1];
+      var key = semestertype + " " + dept + " " + course;
+      if (recommendedcoursekeys.has(key)) {
+        // only executes if course is recommended for at least one major
+
+        coursesections.get(key).add(sectionnumber); // covers fall and spring semesters
+
+      } // if statement
+
+    } // for loop of all fall classes
+
+  } // for loop (to cover fall and spring semesters)
+
+  // populates drop-down list of majors
+  for (let i = 0; i < majors.length; i++) {
+
+    document.getElementById("selectmajor").innerHTML = document.getElementById("selectmajor").innerHTML + "<option value=\"" + majors[i] + "\">" + majors[i] + "</option>"
+
+  } // index i (major)
+
+  // populates drop-down list of semesters
+  for (let i = 0; i < semesters.length; i++) {
+
+    document.getElementById("selectsemester").innerHTML = document.getElementById("selectsemester").innerHTML + "<option value=\"" + semesters[i] + "\">" + semesters[i] + "</option>"
+
+  } // index i (semester)
+
+  // converts 24hr time to 12hr time, ex. "1340" to "1:40 PM"
+  function formattime(time24hr) {
+    var time12hr = 0;
+    if (time24hr < 1300) {
+      time12hr = time24hr;
+    } else {
+      time12hr = time24hr - 1200;
+    }
+    if (time24hr < 1200) {
+      time12hr = time12hr + " AM";
+    } else {
+      time12hr = time12hr + " PM";
+    }
+    if (time24hr = 0) {
+      time12hr = "1200 AM";
+    }
+    time12hr = time12hr.slice(0, time12hr.length - 5) + ":" + time12hr.slice(-5);
+    return time12hr;
+  }
+
+  // names course, ex. "PHYS 217 MW 11:55 AM - 1:20 PM and M 8:35 AM - 11:45 AM"
+  function prettyname(courseinfo) {
+    // dept, course, day, start, end, day, start, end
+
+    var displayname = courseinfo[0] + " " + courseinfo[1] + " ";
+    for (let i = 0; i < (courseinfo.length - 2) / 3; i++) {
+      // steps through every course component (every set of day, start, end)
+
+      displayname = displayname + courseinfo[i * 3 + 2] + " " + formattime(courseinfo[i * 3 + 3]) + " - " + formattime(courseinfo[i * 3 + 4]);
+      if (i + 1 < (courseinfo.length - 2) / 3) {
+
+        displayname = displayname + " and ";
+
+      } // if statement
+
+    } // index i (course component)
+    return displayname;
+
+  } // function prettyname()
+
+  // returns singular case of a word
+  // case-sensitive
+  function singularcase(number, word) {
+    var returnstr;
+    if (number != 1) {
+      returnstr = word; // return original word if plural
+    } else {
+      switch(word) {
+        case "are":
+          returnstr = "is";
+          break;
+        case "combinations":
+          returnstr = "combination";
+          break;
+        case "these":
+          returnstr = "this";
+          break;
+        case "These":
+          returnstr = "This";
+          break;
+        case "conflicts":
+          returnstr = "conflict";
+          break;
+        case "do":
+          returnstr = "does";
+          break;
+        case "schedules":
+          returnstr = "schedule";
+          break;
+        case "sections":
+          returnstr = "section";
+          break;
+        case "components":
+          returnstr = "component";
+          break;
+        default:
+          returnstr = word; // return original word if no singular case found
+          console.log("Singular case not found for: " + word);
+      } // switch case
+    } // if statement
+    return returnstr;
+  } // function singularcase()
+
+  // updates on-screen schedule
+  function updateschedule() {
+
+    // declare variables
+    var selectedsemester = document.getElementById("selectsemester").value;
+    var selectedclasses = document.getElementsByTagName("select");
+    var schedulearray = [[], [], [], [], [], [], []];
+
+    // chooses which map of courses (fall or spring) to use
+    var coursesmap = fallclasses;
+    if (springsemesters.has(selectedsemester)) {
+
+      coursesmap = springclasses;
+
+    } // if statement
+
+    for (let i = 2; i < selectedclasses.length; i++) {
+      // steps through user's selection for each recommended class
+
+      // get the section number and convert it from a string to a number
+      var selectedsection = parseInt(selectedclasses[i].value, 10); // to base10 integer
+      var courseinfo = coursesmap.get(selectedsection);
+      // dept, course, day, start, end, day, start, end, etc.
+      for (let j = 0; j < (courseinfo.length - 2) / 3; j++) {
+        // steps through every course component (every set of day, start, end)
+
+        for (let k = 0; k < 7; k++) {
+          // steps through days of week
+
+          if (courseinfo[j * 3 + 2].indexOf(dayofweek.get(k)) >= 0) {
+            // executes if the day letter is in the course component day, ex. "M" in "MW"
+
+            // names the course component, ex. "PHYS 217 M 8:35 AM - 11:45 AM"
+            // lecture and lab named separately due to index j loop
+            // adds course component name to that day's schedule (from index k)
+            schedulearray[k].push([courseinfo[j * 3 + 3], courseinfo[j * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " " + courseinfo[j * 3 + 2] + " " + formattime(courseinfo[j * 3 + 3]) + " - " + formattime(courseinfo[j * 3 + 4])]); // start, end, name
+
+          } // if statement
+
+        } // index k (day of week)
+
+      } // index j (course component)
+
+    } // index i (user-selected section)
+
+    for (let i = 0; i < 7; i++) {
+      // steps through days of week
+
+      // clear that day's on-screen schedule
+      document.getElementById("schedule" + i + "div").innerHTML = "<p>";
+
+      // sort that day's schedule by start time
+      // (later - const) will be larger than (earlier - const) is
+      schedulearray[i].sort((class1, class2) => class1[0] - class2[0]);
+      for (let j = 0; j < schedulearray[i].length; j++) {
+        // steps through every course scheduled for that day
+
+        var colorstr = "black";
+        var starttime = schedulearray[i][j][0];
+        for (let k = 0; k < j; k++) {
+          // steps through all courses that begin earlier than the current course does
+
+          previousendtime = schedulearray[i][k][1];
+          if (starttime < previousendtime) {
+            // if the current start time is before any previous course's end time
+
+            colorstr = "red";
+
+          } // if statement
+
+        } // index k (all courses that began earlier in day)
+
+        // show course name in that day's on-screen schedule
+        // use red text if current course conflicts with any earlier course
+        document.getElementById("schedule" + i + "div").innerHTML = document.getElementById("schedule" + i + "div").innerHTML + "<span style=\"color: " + colorstr + ";\">" + schedulearray[i][j][2] + "</span><br>";
+
+      } // index j (all courses scheduled for that day)
+
+      document.getElementById("schedule" + i + "div").innerHTML = document.getElementById("schedule" + i + "div").innerHTML + "</p>";
+
+    } // index i (days of the week)
+
+  } // function updateschedule()
+
+  // updates on-screen list of recommended courses, with associated drop-down menus
+  function updaterecommendations() {
+
+    // update status message in case of long calculation time
+    document.getElementById("summarydiv").innerHTML = "Recalculating &hellip;";
+
+    // declare variables
+    var selectedmajor = document.getElementById("selectmajor").value;
+    var selectedsemester = document.getElementById("selectsemester").value;
+    var selectedrecommendations = recommendations[majorcolumns.get(selectedmajor)][semesterrows.get(selectedsemester)];
+
+    // sort recommended courses alphabetically: biology, chemistry, etc.
+    selectedrecommendations.sort();
+
+    // clear the on-screen list of recommended courses
+    document.getElementById("recommendationsdiv").innerHTML = "";
+
+    // chooses which map of courses (fall or spring) to use
+    var coursesmap = fallclasses;
+    var semester = "Fall";
+    if (springsemesters.has(selectedsemester)) {
+
+      coursesmap = springclasses;
+      semester = "Spring";
+
+    } // if statement
+
+    for (let i = 0; i < selectedrecommendations.length; i++) {
+      // steps through all recommended courses for selected major and semester
+
+      // name the recommended course, ex. "BIOL 212 or 214"
+      var dept = selectedrecommendations[i][0];
+      var course = "";
+      for (let j = 1; j < selectedrecommendations[i].length; j++) {
+        // steps through any options, ex. 212 or 214
+
+        if (course != "") {
+          // prepends "or" if not the first course to be listed
+
+          course = course + " or ";
+
+        } // if statement
+        course = course + selectedrecommendations[i][j];
+
+      } // index j (options for recommendation)
+
+      // create a drop-down menu (not yet populated) for the recommended course
+      document.getElementById("recommendationsdiv").innerHTML = document.getElementById("recommendationsdiv").innerHTML + "<p>" + dept + " " + course + ": <select id=\"selectrecommendation" + i + "\" onchange=\"updateschedule()\"></select></p>";
+
+    } // index i (list of recommended courses for given major and semester)
+
+    for (let i = 0; i < selectedrecommendations.length; i++) {
+      // steps through all recommended courses for selected major and semester
+
+      // declare variables
+      var dept = selectedrecommendations[i][0];
+      //var coursecombinations = 0;
+
+      for (let j = 1; j < selectedrecommendations[i].length; j++) {
+        // for the recommendation in question (index i), steps through any options
+        // ex. BIOL (j=0) 212 (j=1) or 214 (j=2)
+
+        var course = selectedrecommendations[i][j]; // course number
+
+        for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort()) {
+          // for the course in question (index j), steps through all sections
+
+          // populate the course's drop-down list with names
+          // names are generated from section numbers with prettyname(sectionnumber)
+          document.getElementById("selectrecommendation" + i).innerHTML = document.getElementById("selectrecommendation" + i).innerHTML + "<option value=" + section + ">" + prettyname(coursesmap.get(section)) + "</option>";
+
+        } // for loop (list of all available sections for given course)
+
+      } // index j (options for recommended course)
+
+    } // index i (list of recommended courses for given major and semester)
+
+    // to count combinations with scheduling conflicts, create combinations first
+    var sectioncombinations = [];
+    for (let i = 0; i < selectedrecommendations.length; i++) {
+      // steps through all recommended courses for selected major and semester
+
+      // declare variables
+      var dept = selectedrecommendations[i][0];
+      var nmodified = 0; // used as counter below
+      // before modifying combinations list, count, existing combinations
+      var ncombinations = sectioncombinations.length;
+
+      for (let j = 1; j < selectedrecommendations[i].length; j++) {
+        // for the recommendation in question (index i), steps through any options
+        // ex. BIOL (j=0) 212 (j=1) or 214 (j=2)
+
+        // declare variables
+        var course = selectedrecommendations[i][j];
+        //var nmodified = 0; // used as counter below
+
+        for (let k = Math.max(0, 2 - j); k < coursesections.get(semester + " " + dept + " " + course).size; k++) {
+          // for the course in question (index j), k counts the sections offered
+          // for each new section offered, repeat the list of existing sections
+          // no repetition is needed for first section, eg. skip k=0
+          //   but only when j=1! otherwise, appending to sections that meet current recommendation (remember j=0 is skipped to find dept name)
+
+          for (let l = 0; l < ncombinations; l++) {
+
+            // to create a deep copy, unpack the elements of each array into a new array
+            //   ... is called "spread" notation
+            sectioncombinations.push([...sectioncombinations[l]]);
+
+          } // index l (number of existing combinations)
+
+        } // index k (number of sections offered for new course)
+
+      } // index j (options for recommended courses)
+
+      for (let j = 1; j < selectedrecommendations[i].length; j++) {
+        // for the recommendation in question (index i), steps through any options
+        // ex. BIOL (j=0) 212 (j=1) or 214 (j=2)
+
+        // declare variables
+        var course = selectedrecommendations[i][j];
+
+        for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort()) {
+          // for the course in question (index j), steps through all sections
+
+          if (i == 0) {
+            // for first recommended course, append one-element arrays of sections
+
+            sectioncombinations.push([section]);
+
+          } else {
+
+            for (let k = 0; k < ncombinations; k++) {
+              // pairs every existing combination with the new section
+
+              sectioncombinations[nmodified + k].push(section);
+
+            } // index k (number of existing combinations)
+
+            // update number of combinations modified *after* modification finished
+            // otherwise, double-counted with nmodified + k
+            nmodified = nmodified + ncombinations;
+
+          } // if statement
+
+        } // for loop (list of all sections offered for course in question)
+
+      } // index j (options for recommended course)
+
+    } // index i (recommended courses for given major and semester)
+
+    // count number of combinations
+    var ncombinations = sectioncombinations.length;
+
+    // count combinations with scheduling conflicts or 10+ hour days
+    var conflictingcourses = new Map(); // don't need to keep track of keys if strings
+    var nconflictedschedules = 0;
+    var nlongdays = 0;
+    var reasonablesections = [];
+    for (let i = 0; i < selectedrecommendations.length; i++) {
+      reasonablesections.push(new Set());
+    }
+    for (let combination of sectioncombinations) {
+
+      var schedulearray = [[], [], [], [], [], [], []];
+
+      for (let section of combination) {
+
+        var courseinfo = coursesmap.get(section);
+        // dept, course, day, start, end, day, start, end, etc.
+        for (let i = 0; i < (courseinfo.length - 2) / 3; i++) {
+          // steps through every course component (every set of day, start, end)
+
+          for (let j = 0; j < 7; j++) {
+            // steps through days of week
+
+            if (courseinfo[i * 3 + 2].indexOf(dayofweek.get(j)) >= 0) {
+              // executes if day letter is in course component day, ex. "M" in "MW"
+
+              // names the course component, ex. "PHYS 217 M 8:35 AM - 11:45 AM"
+              // lecture and lab named separately due to index j loop
+              // adds course component name to that day's schedule (from index j)
+              schedulearray[j].push([courseinfo[i * 3 + 3], courseinfo[i * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " " + courseinfo[i * 3 + 2] + " " + formattime(courseinfo[i * 3 + 3]) + " - " + formattime(courseinfo[i * 3 + 4])]); // start, end, name
+
+            } // if statement
+
+          } // index j (day of week)
+
+        } // index i (course component)
+
+      } // for loop (each section of combination)
+
+      var conflictfound = false;
+      var longdayfound = false;
+      var previousdayend = 1; // initial value 12:01 AM on Sunday before week starts
+      for (let i = 0; i < 7; i++) {
+        // steps through days of week
+
+        // sort that day's schedule by start time
+        // (later - const) will be larger than (earlier - const) is
+        schedulearray[i].sort((class1, class2) => class1[0] - class2[0]);
+
+      } // index i (day of week)
+
+      // update previousdayend if any course is schedule on sunday
+      if (schedulearray[6].length > 0) {
+
+        for (let i = 0; i < schedulearray[6].length; i++) {
+          // steps through every course scheduled for that day
+
+          if (schedulearray[6][i][1] > previousdayend) {
+
+            previousdayend = schedulearray[6][i][1];
+
+          } // if statement
+
+        } // index i (day of week)
+        
+      } // if statement
+
+      for (let i = 0; i < 7; i++) {
+        // steps through days of week
+
+        for (let j = 0; j < schedulearray[i].length; j++) {
+          // steps through every course scheduled for that day
+
+          var starttime = schedulearray[i][j][0];
+          for (let k = 0; k < j; k++) {
+            // steps through all courses that begin earlier than the current course does
+
+            previousendtime = schedulearray[i][k][1];
+            if (starttime < previousendtime) {
+              // if the current start time is before any previous course's end time
+
+              conflictfound = true;
+              var conflictingname1 = schedulearray[i][j][2];
+              var conflictingname2 = schedulearray[i][k][2];
+
+              for (let conflictingname of [conflictingname1, conflictingname2]) {
+
+                if (!conflictingcourses.has(conflictingname)) {
+                  // add key if this is first conflict identified
+
+                  conflictingcourses.set(conflictingname, new Set());
+
+                } // if statement
+
+              } // for loop
+
+              conflictingcourses.get(conflictingname1).add(conflictingname2);
+              conflictingcourses.get(conflictingname2).add(conflictingname1);
+
+            } // if statement
+
+          } // index k (all courses that began earlier in day)
+
+        } // index j (all courses scheduled for that day)
+
+        if ((!conflictfound) && (schedulearray[i].length > 0)) {
+          // only check for long day if at least one class and no schedule conflicts
+
+          var firststart = schedulearray[i][0][0]; // first start time on that day
+          var lastend = schedulearray[i][schedulearray[i].length - 1][1]; // last end time on that day
+
+          if ((lastend - firststart > 1000) || // day lasts more than 10 hours
+              (firststart < previousdayend + 1200 - 2400)) { // must return fewer than 12 hours after previous day ended
+
+            longdayfound = true;
+
+          } // if statement
+
+        } // if statement
+
+        // update ending time to make sure return next day is at least 12 hours later
+        if (schedulearray[i].length > 0) {
+
+          previousdayend = schedulearray[i][schedulearray[i].length - 1][1];
+
+        } else {
+
+          previousdayend = 1; // last class "ends" at 12:01 AM if no classes that day
+
+        } // if statement
+
+      } // index i (day of week)
+
+      if (conflictfound) {
+
+        nconflictedschedules++;
+
+      } else if (longdayfound) {
+
+        nlongdays++;
+
+      } else {
+
+        for (let i = 0; i < combination.length; i++) {
+
+          // courses listed in order as seen on screen, ex. biol, chem, engr, etc.
+          reasonablesections[i].add(combination[i]);
+
+        } // index i (section in combination)
+
+      } // if statement
+
+    } // for loop (each schedule combination)
+
+    // count how many other courses each course conflicts with
+    var conflictingresults = [];
+    for (let [coursename, conflictingset] of conflictingcourses) {
+      conflictingresults.push([coursename, conflictingset.size]);
+    }
+    // sort by number of courses each course conflicts with *in descending order*
+    conflictingresults.sort((course1, course2) => course2[1] - course1[1]);
+    // update on-screen list of conflicting classes
+    document.getElementById("conflictsdiv").innerHTML = "";
+    if (conflictingresults.length > 0) {
+      for (let [coursename, nconflictedsections] of conflictingresults) {
+
+        document.getElementById("conflictsdiv").innerHTML =
+          document.getElementById("conflictsdiv").innerHTML + "<p>" + coursename +
+          " conflicts with " + nconflictedsections + "&nbsp;section " +
+          singularcase(nconflictedsections, "components") + ".</p>";
+
+        var specificconflictingcourses = Array.from(conflictingcourses.get(coursename))
+        var conflictinglistelementsstr = "";
+
+        for (i = 0; i < specificconflictingcourses.length; i++) {
+
+          conflictinglistelementsstr = conflictinglistelementsstr + "<li><p>" + specificconflictingcourses[i] + "</p></li>";
+
+        } // index i (names of sections conflicted with)
+
+        document.getElementById("conflictsdiv").innerHTML =
+          document.getElementById("conflictsdiv").innerHTML + "<ul>" +
+          conflictinglistelementsstr + "</ul>";
+
+      } // for loop (array counting sections conflicted with)
+
+    } else {
+
+      document.getElementById("conflictsdiv").innerHTML = "There are no course conflicts.";
+
+    } // if statement
+
+    // calculate statistics about conflicting courses
+    var fractionconflicted;
+    if (ncombinations != 0) {
+      fractionconflicted = Math.round(nconflictedschedules / ncombinations * 100);
+    } else {
+      fractionconflicted = 0;
+    } // if statement
+    var npossible = ncombinations - nconflictedschedules;
+    var fractionlong;
+    if (npossible != 0) {
+      fractionlong = Math.round(nlongdays / npossible * 100);
+    } else {
+      fractionlong = 0;
+    } // if statement
+    var nsectionsbottleneck = 10000; // will never have 10000 sections to choose from
+    for (let recommendedset of reasonablesections) {
+      if (recommendedset.size < nsectionsbottleneck) {
+        nsectionsbottleneck = recommendedset.size;
+      } // if statement
+    } // for loop (set of reasonable sections that meet each recommendation)
+
+    // display bottlenecks where number of sections limits number of students served
+    document.getElementById("bottleneckdiv").innerHTML = "";
+    if (nsectionsbottleneck > 0) {
+      for (let i = 0; i < selectedrecommendations.length; i++) {
+        var nreasonablesections = reasonablesections[i].size;
+        if (nreasonablesections == nsectionsbottleneck) {
+          // name the recommended course, ex. "BIOL 212 or 214"
+          var dept = selectedrecommendations[i][0];
+          var course = "";
+          for (let j = 1; j < selectedrecommendations[i].length; j++) {
+            // steps through any options, ex. 212 or 214
+
+            if (course != "") {
+              // prepends "or" if not the first course to be listed
+
+              course = course + " or ";
+
+            } // if statement
+            course = course + selectedrecommendations[i][j];
+
+          } // index j (names the course)
+
+          document.getElementById("bottleneckdiv").innerHTML = document.getElementById("bottleneckdiv").innerHTML + "<p>For " + dept + " " + course + " in a reasonable schedule as defined above, students must choose among the following sections.</p>";
+
+          // list the section names from reasonable combinations through the bottleneck
+          var listelementsstr = "";
+          for (let section of Array.from(reasonablesections[i]).sort()) {
+
+            listelementsstr = listelementsstr + "<li>" + prettyname(coursesmap.get(section)) + "</li>";
+
+          } // for loop (section numbers for each recommendation in reasonable schedules)
+
+          document.getElementById("bottleneckdiv").innerHTML =
+            document.getElementById("bottleneckdiv").innerHTML +
+            "<ol>" + listelementsstr + "</ol><p>" +
+            singularcase(nsectionsbottleneck, "These") + " " + nsectionsbottleneck + " " +
+            singularcase(nsectionsbottleneck, "sections") +
+            "&nbsp;&middot;&nbsp;30&nbsp;students per section = " +
+            (nsectionsbottleneck * 30) + "&nbsp;students served.</p>";
+
+        } // if statement
+
+      } // index i (set of reasonable sections that meet each recommendation)
+
+    } else {
+
+      document.getElementById("bottleneckdiv").innerHTML = "There are no reasonable schedule combinations as defined above.";
+
+    } // if statement
+
+    // display summary of conflicting schedules
+    if (selectedrecommendations.length > 0) {
+
+      document.getElementById("summarydiv").innerHTML =
+        "<p>There " +
+        singularcase(ncombinations, "are") + " " +
+        ncombinations + "&nbsp;schedule " +
+        singularcase(ncombinations, "combinations") + " with the recommended courses listed below.</p>" +
+        "<p>Of " +
+        singularcase(ncombinations, "these") + " " +
+        singularcase(ncombinations, "combinations") + ", " +
+        nconflictedschedules + "&nbsp;(" + fractionconflicted + "%) " +
+        singularcase(ncombinations, "are") + " not possible due to scheduling conflicts. These conflicts are listed at the bottom of this page.</p>" +
+        "<p>The following criteria are used to assess whether any given combination is reasonable.</p><ul>" +
+        "<li><p>A student should not have to be on campus for more than 10&nbsp;hours a day on any day of the week.</p></li>" +
+        "<li><p>A student should not have to return to campus fewer than 12&nbsp;hours after his or her last class from the previous day.</p></li>" +
+        "</ul><p>Of the " + npossible + "&nbsp;" +
+        singularcase(npossible, "combinations") + " that " +
+        singularcase(npossible, "are") + " possible, " +
+        nlongdays + "&nbsp;(" + fractionlong + "%) " +
+        singularcase(nlongdays, "do") + " not meet the above criteria for a reasonable schedule.</p>" +
+        "<p>Accounting for overlapping combinations and assuming a typical lab section size of 30&nbsp;students, the remaining " +
+        (npossible - nlongdays) + "&nbsp;reasonable " +
+        singularcase((npossible - nlongdays), "schedules") +
+        " can accommodate approximately " + (nsectionsbottleneck * 30) +
+        "&nbsp;students total per semester.</p>";
+
+    } else {
+
+      document.getElementById("summarydiv").innerHTML = "There are no recommended courses for this major in this semester.";
+
+    }
+
+    // also need to update the on-screen weekly schedule
+    updateschedule();
+
+  } // function updaterecommendations()
+
+  // when page loads, show recommended courses for initial major and semester
+  updaterecommendations();		      
+
+</script>
+
+</html>
