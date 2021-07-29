@@ -532,11 +532,10 @@
   // otherwise, marked as spring semester
   let fallsemesters = new Set();
   let springsemesters = new Set();
-  var selectedsequence = document.getElementsByName("sequence").value;
   for (let semesternumber of semesters) {
 
-    if (((semesternumber % 2 == 1) && (selectedsequence == "on")) ||
-        ((semesternumber % 2 == 0) && (selectedsequence == "off"))) {
+    if (((semesternumber % 2 == 1) && (document.getElementById("onsequenceradio") == True)) ||
+        ((semesternumber % 2 == 0) && (document.getElementById("offsequenceradio") == True))) {
 
       fallsemesters.add(semesternumber);
 
