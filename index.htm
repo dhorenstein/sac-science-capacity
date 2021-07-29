@@ -527,25 +527,31 @@
     semesterrows.set(semesters[i], i);
   }
 
-  // generates sets of fall semester names, ex. "1 (Fall)", and spring semester names
-  // marked as fall semester if "fall" (not case-sensitive) included in name
-  // otherwise, marked as spring semester
+  // generates set of semester numbers and separates into spring or fall
+  // defines function that can be called when sequence (on-sequence or off-sequence) changes
+  // call function when page loads
   let fallsemesters = new Set();
   let springsemesters = new Set();
-  for (let semesternumber of semesters) {
+  function updatesequence() {
+    fallsemesters.clear();
+    springsemesters.clear();
+    for (let semesternumber of semesters) {
+      
+      if (((semesternumber % 2 == 1) && (document.getElementById("onsequenceradio").checked == true)) ||
+          ((semesternumber % 2 == 0) && (document.getElementById("offsequenceradio").checked == true))) {
 
-    if (((semesternumber % 2 == 1) && (document.getElementById("onsequenceradio").checked == true)) ||
-        ((semesternumber % 2 == 0) && (document.getElementById("offsequenceradio").checked == true))) {
+        fallsemesters.add(semesternumber);
+      
+      } else {
+        
+        springsemesters.add(semesternumber);
+      
+      } // if statement
+    
+    } // for loop (all semester numbers)
 
-      fallsemesters.add(semesternumber);
-
-    } else {
-
-      springsemesters.add(semesternumber);
-
-    } // if statement
-
-  } // for loop (all semester names)
+  } //
+  updatesequence();
 
   // generate a map from semester+dept+course to (unpopulated) set of available sections
   // set of semester+dept_course keys needs to be maintained separately
@@ -805,6 +811,8 @@
     document.getElementById("recommendationsdiv").innerHTML = "";
 
     // chooses which map of courses (fall or spring) to use
+    // first, check whether on- or off-sequence
+    updatesequence();
     var coursesmap = fallclasses;
     var semester = "Fall";
     if (springsemesters.has(selectedsemester)) {
@@ -1240,7 +1248,7 @@
 
   } // function updaterecommendations()
 
-  // when page loads, show recommended courses for initial major and semester
+  // when page loads, show recommended courses for initial major, semester, and sequence
   updaterecommendations();		      
 
 </script>
