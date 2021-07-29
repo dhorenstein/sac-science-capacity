@@ -18,12 +18,14 @@
   </select>
   </p>
 
-  <p>
+  <div>
   <input type="radio" id="onsequenceradio" name="sequence" value="on" onchange="updaterecommendations();" checked>
   <label for="on">On-Sequence (semesters 1, 3, and&nbsp;5 in Fall or Intersession; semesters 2, 4, and&nbsp;6 in Spring or Summer)</label>
+  </div>
+  <div>
   <input type="radio" id="offsequenceradio" name="sequence" value="off" onchange="updaterecommendations();">
   <label for="on">Off-Sequence (semesters 1, 3, and&nbsp;5 in Spring or Summer; semesters 2, 4, and&nbsp;6 in Fall or Intersession)</label>
-  </p>
+  </div>
   
   <p>&nbsp;
   </p>
@@ -536,11 +538,11 @@
     if (((semesternumber % 2 == 1) && (selectedsequence == "on")) ||
         ((semesternumber % 2 == 0) && (selectedsequence == "off"))) {
 
-      fallsemesters.add(semestername);
+      fallsemesters.add(semesternumber);
 
     } else {
 
-      springsemesters.add(semestername);
+      springsemesters.add(semesternumber);
 
     } // if statement
 
