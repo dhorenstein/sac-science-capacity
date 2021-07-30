@@ -747,7 +747,7 @@
       var selectedsection = parseInt(selectedclasses[i].value, 10); // to base10 integer
       
       // if no section is offered, there won't be any data with which to update the daily schedule
-      if coursesmap.has(selectedsection) {
+      if (coursesmap.has(selectedsection)) {
       
         var courseinfo = coursesmap.get(selectedsection);
         // dept, course, day, start, end, day, start, end, etc.
@@ -880,7 +880,7 @@
 
         var course = selectedrecommendations[i][j]; // course number
 
-        if coursesections.has(semester + " " + dept + " " + course) {
+        if (coursesections.has(semester + " " + dept + " " + course)) {
           // only executes if at least 1 section of course is offered in given semester
         
           for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort()) {
@@ -930,7 +930,7 @@
         var course = selectedrecommendations[i][j];
         //var nmodified = 0; // used as counter below
 
-        if coursesections.has(semester + " " + dept + " " + course) {
+        if (coursesections.has(semester + " " + dept + " " + course)) {
           // only executes if at least 1 section of course is offered in given semester
 
           for (let k = Math.max(0, 2 - j); k < coursesections.get(semester + " " + dept + " " + course).size; k++) {
@@ -960,7 +960,7 @@
         // declare variables
         var course = selectedrecommendations[i][j];
         
-        if coursesections.has(semester + " " + dept + " " + course) {
+        if (coursesections.has(semester + " " + dept + " " + course)) {
           // only executes if at least 1 section of course is offered in given semester
 
           for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort()) {
