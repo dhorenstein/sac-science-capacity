@@ -900,12 +900,12 @@
       // otherwise, ensure drop-down menu is enabled
       if (document.getElementById("selectrecommendation" + i).length == 0) {
         
-        document.getElementById("selectrecommendation" + i).disabled == true;
-        document.getElementById("selectrecommendation" + i).innerHTML = "<option value=\"\"><i>No sections offered in selected semester</i></option>";
+        document.getElementById("selectrecommendation" + i).disabled = true;
+        document.getElementById("selectrecommendation" + i).innerHTML = "<option value=\"\">[No sections offered in selected semester]</option>";
         
       } else {
         
-        document.getElementById("selectrecommendation" + i).disabled == false;
+        document.getElementById("selectrecommendation" + i).disabled = false;
         
       } // if statement (1+ sections offered in given semester)
 
