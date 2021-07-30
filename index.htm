@@ -537,8 +537,8 @@
     springsemesters.clear();
     for (let semesternumber of semesters) {
       
-      if (((semesternumber % 2 == 1) && (document.getElementById("onsequenceradio").checked == true)) ||
-          ((semesternumber % 2 == 0) && (document.getElementById("offsequenceradio").checked == true))) {
+      if (((semesternumber % 2 == 1) && (document.getElementById("onsequenceradio").checked)) ||
+          ((semesternumber % 2 == 0) && (document.getElementById("offsequenceradio").checked))) {
 
         fallsemesters.add(semesternumber);
       
@@ -730,27 +730,33 @@
 
       // get the section number and convert it from a string to a number
       var selectedsection = parseInt(selectedclasses[i].value, 10); // to base10 integer
-      var courseinfo = coursesmap.get(selectedsection);
-      // dept, course, day, start, end, day, start, end, etc.
-      for (let j = 0; j < (courseinfo.length - 2) / 3; j++) {
-        // steps through every course component (every set of day, start, end)
+      
+      // if no section is offered, there won't be any data with which to update the daily schedule
+      if coursesmap.has(selectedsection) {
+      
+        var courseinfo = coursesmap.get(selectedsection);
+        // dept, course, day, start, end, day, start, end, etc.
+        for (let j = 0; j < (courseinfo.length - 2) / 3; j++) {
+          // steps through every course component (every set of day, start, end)
 
-        for (let k = 0; k < 7; k++) {
-          // steps through days of week
+          for (let k = 0; k < 7; k++) {
+            // steps through days of week
 
-          if (courseinfo[j * 3 + 2].indexOf(dayofweek.get(k)) >= 0) {
-            // executes if the day letter is in the course component day, ex. "M" in "MW"
+            if (courseinfo[j * 3 + 2].indexOf(dayofweek.get(k)) >= 0) {
+              // executes if the day letter is in the course component day, ex. "M" in "MW"
 
-            // names the course component, ex. "PHYS 217 M 8:35 AM - 11:45 AM"
-            // lecture and lab named separately due to index j loop
-            // adds course component name to that day's schedule (from index k)
-            schedulearray[k].push([courseinfo[j * 3 + 3], courseinfo[j * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " " + courseinfo[j * 3 + 2] + " " + formattime(courseinfo[j * 3 + 3]) + " - " + formattime(courseinfo[j * 3 + 4])]); // start, end, name
+              // names the course component, ex. "PHYS 217 M 8:35 AM - 11:45 AM"
+              // lecture and lab named separately due to index j loop
+              // adds course component name to that day's schedule (from index k)
+              schedulearray[k].push([courseinfo[j * 3 + 3], courseinfo[j * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " " + courseinfo[j * 3 + 2] + " " + formattime(courseinfo[j * 3 + 3]) + " - " + formattime(courseinfo[j * 3 + 4])]); // start, end, name
 
-          } // if statement
+            } // if statement
 
-        } // index k (day of week)
+          } // index k (day of week)
 
-      } // index j (course component)
+        } // index j (course component)
+      
+      } // if statement (is 1+ section offered?)
 
     } // index i (user-selected section)
 
@@ -859,7 +865,7 @@
 
         var course = selectedrecommendations[i][j]; // course number
 
-        if (coursesections.has(semester + " " + dept + " " + course) == true) {
+        if coursesections.has(semester + " " + dept + " " + course) {
           // only executes if at least 1 section of course is offered in given semester
         
           for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort()) {
@@ -896,7 +902,7 @@
         var course = selectedrecommendations[i][j];
         //var nmodified = 0; // used as counter below
 
-        if (coursesections.has(semester + " " + dept + " " + course) == true) {
+        if coursesections.has(semester + " " + dept + " " + course) {
           // only executes if at least 1 section of course is offered in given semester
 
           for (let k = Math.max(0, 2 - j); k < coursesections.get(semester + " " + dept + " " + course).size; k++) {
@@ -926,7 +932,7 @@
         // declare variables
         var course = selectedrecommendations[i][j];
         
-        if (coursesections.has(semester + " " + dept + " " + course) == true) {
+        if coursesections.has(semester + " " + dept + " " + course) {
           // only executes if at least 1 section of course is offered in given semester
 
           for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort()) {
