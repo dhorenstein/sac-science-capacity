@@ -18,6 +18,15 @@
   </select>
   </p>
 
+  <div>
+  <input type="radio" id="onsequenceradio" name="sequence" value="on" onchange="updaterecommendations();" checked>
+  <label for="on">On-Sequence (semesters 1, 3, and&nbsp;5 in Fall or Intersession; semesters 2, 4, and&nbsp;6 in Spring or Summer)</label>
+  </div>
+  <div>
+  <input type="radio" id="offsequenceradio" name="sequence" value="off" onchange="updaterecommendations();">
+  <label for="on">Off-Sequence (semesters 1, 3, and&nbsp;5 in Spring or Summer; semesters 2, 4, and&nbsp;6 in Fall or Intersession)</label>
+  </div>
+  
   <p>&nbsp;
   </p>
 
@@ -114,12 +123,12 @@
 
   // list of semesters
   let semesters = [
-  "1 (Fall)",
-  "2 (Spring)",
-  "3 (Fall)",
-  "4 (Spring)",
-  "5 (Fall)",
-  "6 (Spring)"
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6"
   ];
 
   // list of recommended courses for each major and semester
@@ -518,24 +527,31 @@
     semesterrows.set(semesters[i], i);
   }
 
-  // generates sets of fall semester names, ex. "1 (Fall)", and spring semester names
-  // marked as fall semester if "fall" (not case-sensitive) included in name
-  // otherwise, marked as spring semester
+  // generates set of semester numbers and separates into spring or fall
+  // defines function that can be called when sequence (on-sequence or off-sequence) changes
+  // call function when page loads
   let fallsemesters = new Set();
   let springsemesters = new Set();
-  for (let semestername of semesters) {
+  function updatesequence() {
+    fallsemesters.clear();
+    springsemesters.clear();
+    for (let semesternumber of semesters) {
+      
+      if (((semesternumber % 2 == 1) && (document.getElementById("onsequenceradio").checked == true)) ||
+          ((semesternumber % 2 == 0) && (document.getElementById("offsequenceradio").checked == true))) {
 
-    if (semestername.toLowerCase().includes("fall")) {
+        fallsemesters.add(semesternumber);
+      
+      } else {
+        
+        springsemesters.add(semesternumber);
+      
+      } // if statement
+    
+    } // for loop (all semester numbers)
 
-      fallsemesters.add(semestername);
-
-    } else {
-
-      springsemesters.add(semestername);
-
-    } // if statement
-
-  } // for loop (all semester names)
+  } //
+  updatesequence();
 
   // generate a map from semester+dept+course to (unpopulated) set of available sections
   // set of semester+dept_course keys needs to be maintained separately
@@ -710,6 +726,7 @@
 
     for (let i = 2; i < selectedclasses.length; i++) {
       // steps through user's selection for each recommended class
+      // skip first 2 select tags (on- and off-sequence are radio tags, not select)
 
       // get the section number and convert it from a string to a number
       var selectedsection = parseInt(selectedclasses[i].value, 10); // to base10 integer
@@ -794,6 +811,8 @@
     document.getElementById("recommendationsdiv").innerHTML = "";
 
     // chooses which map of courses (fall or spring) to use
+    // first, check whether on- or off-sequence
+    updatesequence();
     var coursesmap = fallclasses;
     var semester = "Fall";
     if (springsemesters.has(selectedsemester)) {
@@ -1229,7 +1248,7 @@
 
   } // function updaterecommendations()
 
-  // when page loads, show recommended courses for initial major and semester
+  // when page loads, show recommended courses for initial major, semester, and sequence
   updaterecommendations();		      
 
 </script>
