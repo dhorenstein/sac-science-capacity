@@ -925,31 +925,36 @@
 
         // declare variables
         var course = selectedrecommendations[i][j];
+        
+        if (coursesections.has(semester + " " + dept + " " + course) == true) {
+          // only executes if at least 1 section of course is offered in given semester
 
-        for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort()) {
-          // for the course in question (index j), steps through all sections
+          for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort()) {
+            // for the course in question (index j), steps through all sections
 
-          if (i == 0) {
-            // for first recommended course, append one-element arrays of sections
+            if (i == 0) {
+              // for first recommended course, append one-element arrays of sections
 
-            sectioncombinations.push([section]);
+              sectioncombinations.push([section]);
 
-          } else {
+            } else {
 
-            for (let k = 0; k < ncombinations; k++) {
-              // pairs every existing combination with the new section
+              for (let k = 0; k < ncombinations; k++) {
+                // pairs every existing combination with the new section
 
-              sectioncombinations[nmodified + k].push(section);
+                sectioncombinations[nmodified + k].push(section);
 
-            } // index k (number of existing combinations)
+              } // index k (number of existing combinations)
 
-            // update number of combinations modified *after* modification finished
-            // otherwise, double-counted with nmodified + k
-            nmodified = nmodified + ncombinations;
+              // update number of combinations modified *after* modification finished
+              // otherwise, double-counted with nmodified + k
+              nmodified = nmodified + ncombinations;
 
-          } // if statement
+            } // if statement
 
-        } // for loop (list of all sections offered for course in question)
+          } // for loop (list of all sections offered for course in question)
+          
+        } // if statement (1+ sections of given course offered in given semester)
 
       } // index j (options for recommended course)
 
