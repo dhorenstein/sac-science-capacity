@@ -896,21 +896,26 @@
         var course = selectedrecommendations[i][j];
         //var nmodified = 0; // used as counter below
 
-        for (let k = Math.max(0, 2 - j); k < coursesections.get(semester + " " + dept + " " + course).size; k++) {
-          // for the course in question (index j), k counts the sections offered
-          // for each new section offered, repeat the list of existing sections
-          // no repetition is needed for first section, eg. skip k=0
-          //   but only when j=1! otherwise, appending to sections that meet current recommendation (remember j=0 is skipped to find dept name)
+        if (coursesections.has(semester + " " + dept + " " + course) == true) {
+          // only executes if at least 1 section of course is offered in given semester
 
-          for (let l = 0; l < ncombinations; l++) {
+          for (let k = Math.max(0, 2 - j); k < coursesections.get(semester + " " + dept + " " + course).size; k++) {
+            // for the course in question (index j), k counts the sections offered
+            // for each new section offered, repeat the list of existing sections
+            // no repetition is needed for first section, eg. skip k=0
+            //   but only when j=1! otherwise, appending to sections that meet current recommendation (remember j=0 is skipped to find dept name)
 
-            // to create a deep copy, unpack the elements of each array into a new array
-            //   ... is called "spread" notation
-            sectioncombinations.push([...sectioncombinations[l]]);
+            for (let l = 0; l < ncombinations; l++) {
 
-          } // index l (number of existing combinations)
+              // to create a deep copy, unpack the elements of each array into a new array
+              //   ... is called "spread" notation
+              sectioncombinations.push([...sectioncombinations[l]]);
 
-        } // index k (number of sections offered for new course)
+            } // index l (number of existing combinations)
+
+          } // index k (number of sections offered for new course)
+          
+        } // if statement (1+ sections of given course offered in given semester
 
       } // index j (options for recommended courses)
 
