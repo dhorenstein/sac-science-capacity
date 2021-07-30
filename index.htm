@@ -14,8 +14,10 @@
   </p>
 
   <p>Semester:
-  <select id="selectsemester" onchange="updaterecommendations();">
-  </select>
+    <select id="selectsemester" onchange="updaterecommendations();">
+    </select>
+    <span id="labelsemester">
+    </span>
   </p>
 
   <div>
@@ -549,8 +551,21 @@
       } // if statement
     
     } // for loop (all semester numbers)
-
-  } //
+    
+    // update semester label as Fall or Spring depending on selected sequence
+    var selectedsemester = document.getElementById("selectsemester").value;
+    if (((selectedsemester % 2 == 1) && (document.getElementById("onsequenceradio").checked)) ||
+        ((selectedsemester % 2 == 0) && (document.getElementById("offsequenceradio").checked))) {
+      
+      document.getElementById("labelsemester").innerHTML = "Fall";
+      
+    } else {
+      
+      document.getElementById("labelsemester").innerHTML = "Spring";
+            
+    }
+    
+  } // function updatesequence()
   updatesequence();
 
   // generate a map from semester+dept+course to (unpopulated) set of available sections
