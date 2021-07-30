@@ -880,6 +880,19 @@
         } // if statement (1+ sections of course offered in given semester)
 
       } // index j (options for recommended course)
+      
+      // if no sections of given course are offered in given semester, disable drop-down menu
+      // otherwise, ensure drop-down menu is enabled
+      if (document.getElementById("selectrecommendation" + i).length == 0) {
+        
+        document.getElementById("selectrecommendation" + i).disabled == true;
+        document.getElementById("selectrecommendation" + i).innerHTML = "<option value=\"\"><i>No sections offered in selected semester</i></option>";
+        
+      } else {
+        
+        document.getElementById("selectrecommendation" + i).disabled == false;
+        
+      } // if statement (1+ sections offered in given semester)
 
     } // index i (list of recommended courses for given major and semester)
 
