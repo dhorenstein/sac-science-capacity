@@ -859,14 +859,19 @@
 
         var course = selectedrecommendations[i][j]; // course number
 
-        for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort()) {
-          // for the course in question (index j), steps through all sections
+        if (coursesections.has(semester + " " + dept + " " + course) == true) {
+          // only executes if at least 1 section of course is offered in given semester
+        
+          for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort()) {
+            // for the course in question (index j), steps through all sections
 
-          // populate the course's drop-down list with names
-          // names are generated from section numbers with prettyname(sectionnumber)
-          document.getElementById("selectrecommendation" + i).innerHTML = document.getElementById("selectrecommendation" + i).innerHTML + "<option value=" + section + ">" + prettyname(coursesmap.get(section)) + "</option>";
-
-        } // for loop (list of all available sections for given course)
+            // populate the course's drop-down list with names
+            // names are generated from section numbers with prettyname(sectionnumber)
+            document.getElementById("selectrecommendation" + i).innerHTML = document.getElementById("selectrecommendation" + i).innerHTML + "<option value=" + section + ">" + prettyname(coursesmap.get(section)) + "</option>";
+          
+          } // for loop (list of all available sections for given course)
+          
+        } // if statement (1+ sections of course offered in given semester)
 
       } // index j (options for recommended course)
 
