@@ -318,83 +318,10 @@
   // list of all relevant classes
   // maps from section number to course info
   // course info: dept, course, day, start, end, day, start, end, etc.
+  // retrieved asynchronously near end of document when page loads
   // uses fall 2019 and spring 2020 data
   let fallclasses = new Map();
   let springclasses = new Map();
-
-  springclasses.set(78838,["BIOL",211,"TR",1155,1320,"TR",835,1145]);
-  springclasses.set(78839,["BIOL",211,"TR",1155,1320,"TR",1340,1650]);
-  springclasses.set(78842,["BIOL",212,"MW",1020,1145,"MW",1155,1505]);
-  springclasses.set(78843,["BIOL",214,"TR",1155,1320,"TR",1340,1650]);
-  springclasses.set(78414,["CHEM",229,"TR",835,1000,"MW",1020,1330]);
-  springclasses.set(78415,["CHEM",229,"TR",835,1000,"TR",1020,1330]);
-  springclasses.set(78417,["CHEM",259,"MW",835,1000,"MW",1020,1330]);
-  springclasses.set(78418,["CHEM",259,"TR",835,1000,"TR",1020,1330]);
-  springclasses.set(80008,["CMPR",121,"TR",1020,1145,"TR",1155,1215]);
-  springclasses.set(80009,["CMPR",121,"W",1800,2110,"W",2120,2220]);
-  springclasses.set(80158,["ENGR",240,"W",1020,1330]);
-  springclasses.set(78939,["MATH",162,"MW",800,1005]);
-  springclasses.set(78941,["MATH",162,"TR",800,1005]);
-  springclasses.set(78891,["MATH",162,"MWF",1015,1320]);
-  springclasses.set(78940,["MATH",162,"MW",1020,1225]);
-  springclasses.set(78942,["MATH",162,"TR",1235,1440]);
-  springclasses.set(78943,["MATH",162,"TR",1735,1940]);
-  springclasses.set(78946,["MATH",180,"MW",800,1005]);
-  springclasses.set(78947,["MATH",180,"MW",1020,1225]);
-  springclasses.set(78949,["MATH",180,"TR",1020,1225]);
-  springclasses.set(78950,["MATH",180,"TR",1235,1440]);
-  springclasses.set(78948,["MATH",180,"MW",1735,1940]);
-  springclasses.set(78953,["MATH",185,"MW",800,1005]);
-  springclasses.set(78954,["MATH",185,"MW",1020,1225]);
-  springclasses.set(78956,["MATH",185,"TR",1235,1440]);
-  springclasses.set(78955,["MATH",185,"TR",1950,2155]);
-  springclasses.set(78978,["MATH",219,"TR",800,1005]);
-  springclasses.set(79109,["MATH",219,"F",800,1215,"F",1225,1420]);
-  springclasses.set(79093,["MATH",219,"F",800,1215,"F",1225,1420]);
-  springclasses.set(79097,["MATH",219,"S",800,1215,"S",1225,1420]);
-  springclasses.set(78965,["MATH",219,"MW",800,1005]);
-  springclasses.set(78970,["MATH",219,"TR",800,1005]);
-  springclasses.set(78975,["MATH",219,"F",800,1215]);
-  springclasses.set(78976,["MATH",219,"S",800,1215]);
-  springclasses.set(79099,["MATH",219,"MW",835,1040,"MW",1050,1140]);
-  springclasses.set(79111,["MATH",219,"MW",835,1040,"MW",1050,1140]);
-  springclasses.set(79074,["MATH",219,"TR",835,1040,"TR",1050,1140]);
-  springclasses.set(78966,["MATH",219,"MW",1020,1225]);
-  springclasses.set(79057,["MATH",219,"MW",1020,1225,"MW",1235,1325]);
-  springclasses.set(78971,["MATH",219,"TR",1020,1225]);
-  springclasses.set(79117,["MATH",219,"TR",1020,1225,"TR",1235,1325]);
-  springclasses.set(79101,["MATH",219,"MW",1155,1400,"MW",1410,1500]);
-  springclasses.set(79105,["MATH",219,"TR",1155,1400,"TR",1410,1500]);
-  springclasses.set(79077,["MATH",219,"TR",1155,1400,"TR",1410,1500]);
-  springclasses.set(78967,["MATH",219,"MW",1235,1440]);
-  springclasses.set(78972,["MATH",219,"TR",1235,1440]);
-  springclasses.set(78977,["MATH",219,"MW",1235,1440]);
-  springclasses.set(79070,["MATH",219,"MW",1340,1545,"MW",1555,1645]);
-  springclasses.set(79113,["MATH",219,"MW",1520,1725,"MW",1735,1825]);
-  springclasses.set(78979,["MATH",219,"TR",1520,1725]);
-  springclasses.set(79121,["MATH",219,"TR",1520,1725,"TR",1735,1825]);
-  springclasses.set(79103,["MATH",219,"MW",1520,1725,"MW",1735,1825]);
-  springclasses.set(79079,["MATH",219,"TR",1520,1725,"TR",1735,1825]);
-  springclasses.set(79072,["MATH",219,"MW",1730,1935,"MW",1945,2035]);
-  springclasses.set(78973,["MATH",219,"TR",1735,1940]);
-  springclasses.set(78968,["MATH",219,"MW",1735,1940]);
-  springclasses.set(79119,["MATH",219,"TR",1800,2005,"TR",2015,2105]);
-  springclasses.set(79115,["MATH",219,"MW",1840,2045,"MW",2055,2145]);
-  springclasses.set(79107,["MATH",219,"TR",1840,2045,"TR",2055,2145]);
-  springclasses.set(79089,["MATH",219,"TR",1840,2045,"TR",2055,2145]);
-  springclasses.set(78969,["MATH",219,"MW",1945,2150]);
-  springclasses.set(78974,["MATH",219,"TR",1945,2150]);
-  springclasses.set(78962,["MATH",280,"MW",1235,1440]);
-  springclasses.set(78963,["MATH",280,"TR",1800,2005]);
-  springclasses.set(78964,["MATH",287,"MW",1340,1610]);
-  springclasses.set(nextindex(),["PHYS",289,"T",1520,1830,"F",1520,1830]);
-  springclasses.set(nextindex(),["PHYS",211,"T",1840,2150,"R",1520,1830]);
-  springclasses.set(nextindex(),["PHYS",211,"T",1840,2150,"R",1840,2150]);
-  springclasses.set(nextindex(),["PHYS",217,"MW",1340,1505,"M",835,1145]);
-  springclasses.set(nextindex(),["PHYS",217,"MW",1340,1505,"W",835,1145]);
-  springclasses.set(nextindex(),["PHYS",227,"TR",1340,1505,"T",835,1145]);
-  springclasses.set(nextindex(),["PHYS",227,"TR",1340,1505,"R",835,1145]);
-  springclasses.set(nextindex(),["PHYS",237,"MW",1710,1825,"W",1340,1650]);
 
   // maps day of week from number (0-6) to letter
   let dayofweek = new Map();
@@ -459,6 +386,7 @@
 
   // generate a map from semester+dept+course to (unpopulated) set of available sections
   // set of semester+dept_course keys needs to be maintained separately
+  // [later, after retrieving list of sections, populate map from semester+dept+course with set of available sections]
   let coursesections = new Map();
   var recommendedcoursekeys = new Set();
   for (let i = 0; i < recommendations.length; i++) {
@@ -494,26 +422,6 @@
     } // index j (semester)
 
   } // index i (major)
-
-  // populate map from semester+dept+course with set of available sections
-  for (let [semestertype, coursesmap] of [["Fall", fallclasses],
-                                          ["Spring", springclasses]]) {
-    for (let [sectionnumber, courseinfo] of coursesmap.entries()) {
-      // steps through all classes offered in the given semester
-
-      var dept = courseinfo[0];
-      var course = courseinfo[1];
-      var key = semestertype + " " + dept + " " + course;
-      if (recommendedcoursekeys.has(key)) {
-        // only executes if course is recommended for at least one major
-
-        coursesections.get(key).add(sectionnumber); // covers fall and spring semesters
-
-      } // if statement
-
-    } // for loop of all fall classes
-
-  } // for loop (to cover fall and spring semesters)
 
   // populates drop-down list of majors
   for (let i = 0; i < majors.length; i++) {
@@ -1197,16 +1105,45 @@
       // course structure: [semester, section number, [course info]]
       // replace section number of -1 with nextindex()
       if (course[1] == -1) {
+        
         course[1] = nextindex();
-      }
+        
+      } // if statement (replace modified course indexes)
       if ((course[0] == "Fall") || (course[0] == "Intersession")) {
+        
         fallclasses.set(course[1], course[2]); // key: section number; value: course info
+        
       } else {
+        
         springclasses.set(course[1], course[2]); // key: section number; value: course info
-      }
-    }
+        
+      } // if statement (add each course to list of either fall or spring classes)
+      
+    } // for loop (process each course received asynchronously)
+    
+    // populate map from semester+dept+course with set of available sections
+    for (let [semestertype, coursesmap] of [["Fall", fallclasses],
+                                            ["Spring", springclasses]]) {
+      for (let [sectionnumber, courseinfo] of coursesmap.entries()) {
+        // steps through all classes offered in the given semester
+
+        var dept = courseinfo[0];
+        var course = courseinfo[1];
+        var key = semestertype + " " + dept + " " + course;
+        if (recommendedcoursekeys.has(key)) {
+          // only executes if course is recommended for at least one major
+
+          coursesections.get(key).add(sectionnumber); // covers fall and spring semesters
+
+        } // if statement
+
+      } // for loop of all fall classes
+
+    } // for loop (to cover fall and spring semesters)
+    
     // when page loads and courses have been retrieved, show recommended courses for initial major and semester
-    updaterecommendations();		
+    updaterecommendations();
+    
   } // return function from asynchronous json request
 
 </script>
