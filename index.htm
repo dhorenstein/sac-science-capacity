@@ -459,6 +459,7 @@
 
   // generate a map from semester+dept+course to (unpopulated) set of available sections
   // set of semester+dept_course keys needs to be maintained separately
+  // [later, after retrieving list of sections, populate map from semester+dept+course with set of available sections]
   let coursesections = new Map();
   var recommendedcoursekeys = new Set();
   for (let i = 0; i < recommendations.length; i++) {
@@ -494,26 +495,6 @@
     } // index j (semester)
 
   } // index i (major)
-
-  // populate map from semester+dept+course with set of available sections
-  for (let [semestertype, coursesmap] of [["Fall", fallclasses],
-                                          ["Spring", springclasses]]) {
-    for (let [sectionnumber, courseinfo] of coursesmap.entries()) {
-      // steps through all classes offered in the given semester
-
-      var dept = courseinfo[0];
-      var course = courseinfo[1];
-      var key = semestertype + " " + dept + " " + course;
-      if (recommendedcoursekeys.has(key)) {
-        // only executes if course is recommended for at least one major
-
-        coursesections.get(key).add(sectionnumber); // covers fall and spring semesters
-
-      } // if statement
-
-    } // for loop of all fall classes
-
-  } // for loop (to cover fall and spring semesters)
 
   // populates drop-down list of majors
   for (let i = 0; i < majors.length; i++) {
@@ -1197,16 +1178,45 @@
       // course structure: [semester, section number, [course info]]
       // replace section number of -1 with nextindex()
       if (course[1] == -1) {
+        
         course[1] = nextindex();
-      }
+        
+      } // if statement (replace modified course indexes)
       if ((course[0] == "Fall") || (course[0] == "Intersession")) {
+        
         fallclasses.set(course[1], course[2]); // key: section number; value: course info
+        
       } else {
+        
         springclasses.set(course[1], course[2]); // key: section number; value: course info
-      }
-    }
+        
+      } // if statement (add each course to list of either fall or spring classes)
+      
+    } // for loop (process each course received asynchronously)
+    
+    // populate map from semester+dept+course with set of available sections
+    for (let [semestertype, coursesmap] of [["Fall", fallclasses],
+                                            ["Spring", springclasses]]) {
+      for (let [sectionnumber, courseinfo] of coursesmap.entries()) {
+        // steps through all classes offered in the given semester
+
+        var dept = courseinfo[0];
+        var course = courseinfo[1];
+        var key = semestertype + " " + dept + " " + course;
+        if (recommendedcoursekeys.has(key)) {
+          // only executes if course is recommended for at least one major
+
+          coursesections.get(key).add(sectionnumber); // covers fall and spring semesters
+
+        } // if statement
+
+      } // for loop of all fall classes
+
+    } // for loop (to cover fall and spring semesters)
+    
     // when page loads and courses have been retrieved, show recommended courses for initial major and semester
-    updaterecommendations();		
+    updaterecommendations();
+    
   } // return function from asynchronous json request
 
 </script>
