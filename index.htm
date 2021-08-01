@@ -14,10 +14,21 @@
   </p>
 
   <p>Semester:
-  <select id="selectsemester" onchange="updaterecommendations();">
-  </select>
+    <select id="selectsemester" onchange="updaterecommendations();">
+    </select>
+    <span id="labelsemester">
+    </span>
   </p>
 
+  <div>
+  <input type="radio" id="onsequenceradio" name="sequence" value="on" onchange="updaterecommendations();" checked>
+  <label for="on">On-Sequence (semesters 1, 3, and&nbsp;5 in Fall or Intersession; semesters 2, 4, and&nbsp;6 in Spring or Summer)</label>
+  </div>
+  <div>
+  <input type="radio" id="offsequenceradio" name="sequence" value="off" onchange="updaterecommendations();">
+  <label for="on">Off-Sequence (semesters 1, 3, and&nbsp;5 in Spring or Summer; semesters 2, 4, and&nbsp;6 in Fall or Intersession)</label>
+  </div>
+  
   <p>&nbsp;
   </p>
 
@@ -114,12 +125,12 @@
 
   // list of semesters
   let semesters = [
-  "1 (Fall)",
-  "2 (Spring)",
-  "3 (Fall)",
-  "4 (Spring)",
-  "5 (Fall)",
-  "6 (Spring)"
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6"
   ];
 
   // list of recommended courses for each major and semester
@@ -407,24 +418,44 @@
     semesterrows.set(semesters[i], i);
   }
 
-  // generates sets of fall semester names, ex. "1 (Fall)", and spring semester names
-  // marked as fall semester if "fall" (not case-sensitive) included in name
-  // otherwise, marked as spring semester
+  // generates set of semester numbers and separates into spring or fall
+  // defines function that can be called when sequence (on-sequence or off-sequence) changes
+  // call function when page loads
   let fallsemesters = new Set();
   let springsemesters = new Set();
-  for (let semestername of semesters) {
+  function updatesequence() {
+    fallsemesters.clear();
+    springsemesters.clear();
+    for (let semesternumber of semesters) {
+      
+      if (((semesternumber % 2 == 1) && (document.getElementById("onsequenceradio").checked)) ||
+          ((semesternumber % 2 == 0) && (document.getElementById("offsequenceradio").checked))) {
 
-    if (semestername.toLowerCase().includes("fall")) {
-
-      fallsemesters.add(semestername);
-
+        fallsemesters.add(semesternumber);
+      
+      } else {
+        
+        springsemesters.add(semesternumber);
+      
+      } // if statement
+    
+    } // for loop (all semester numbers)
+    
+    // update semester label as Fall or Spring depending on selected sequence
+    var selectedsemester = document.getElementById("selectsemester").value;
+    if (((selectedsemester % 2 == 1) && (document.getElementById("onsequenceradio").checked)) ||
+        ((selectedsemester % 2 == 0) && (document.getElementById("offsequenceradio").checked))) {
+      
+      document.getElementById("labelsemester").innerHTML = "Fall or Intersession";
+      
     } else {
-
-      springsemesters.add(semestername);
-
-    } // if statement
-
-  } // for loop (all semester names)
+      
+      document.getElementById("labelsemester").innerHTML = "Spring or Summer";
+            
+    }
+    
+  } // function updatesequence()
+  updatesequence();
 
   // generate a map from semester+dept+course to (unpopulated) set of available sections
   // set of semester+dept_course keys needs to be maintained separately
@@ -599,30 +630,37 @@
 
     for (let i = 2; i < selectedclasses.length; i++) {
       // steps through user's selection for each recommended class
+      // skip first 2 select tags (on- and off-sequence are radio tags, not select)
 
       // get the section number and convert it from a string to a number
       var selectedsection = parseInt(selectedclasses[i].value, 10); // to base10 integer
-      var courseinfo = coursesmap.get(selectedsection);
-      // dept, course, day, start, end, day, start, end, etc.
-      for (let j = 0; j < (courseinfo.length - 2) / 3; j++) {
-        // steps through every course component (every set of day, start, end)
+      
+      // if no section is offered, there won't be any data with which to update the daily schedule
+      if (coursesmap.has(selectedsection)) {
+      
+        var courseinfo = coursesmap.get(selectedsection);
+        // dept, course, day, start, end, day, start, end, etc.
+        for (let j = 0; j < (courseinfo.length - 2) / 3; j++) {
+          // steps through every course component (every set of day, start, end)
 
-        for (let k = 0; k < 7; k++) {
-          // steps through days of week
+          for (let k = 0; k < 7; k++) {
+            // steps through days of week
 
-          if (courseinfo[j * 3 + 2].indexOf(dayofweek.get(k)) >= 0) {
-            // executes if the day letter is in the course component day, ex. "M" in "MW"
+            if (courseinfo[j * 3 + 2].indexOf(dayofweek.get(k)) >= 0) {
+              // executes if the day letter is in the course component day, ex. "M" in "MW"
 
-            // names the course component, ex. "PHYS 217 M 8:35 AM - 11:45 AM"
-            // lecture and lab named separately due to index j loop
-            // adds course component name to that day's schedule (from index k)
-            schedulearray[k].push([courseinfo[j * 3 + 3], courseinfo[j * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " " + courseinfo[j * 3 + 2] + " " + formattime(courseinfo[j * 3 + 3]) + " - " + formattime(courseinfo[j * 3 + 4])]); // start, end, name
+              // names the course component, ex. "PHYS 217 M 8:35 AM - 11:45 AM"
+              // lecture and lab named separately due to index j loop
+              // adds course component name to that day's schedule (from index k)
+              schedulearray[k].push([courseinfo[j * 3 + 3], courseinfo[j * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " " + courseinfo[j * 3 + 2] + " " + formattime(courseinfo[j * 3 + 3]) + " - " + formattime(courseinfo[j * 3 + 4])]); // start, end, name
 
-          } // if statement
+            } // if statement
 
-        } // index k (day of week)
+          } // index k (day of week)
 
-      } // index j (course component)
+        } // index j (course component)
+      
+      } // if statement (is 1+ section offered?)
 
     } // index i (user-selected section)
 
@@ -683,6 +721,8 @@
     document.getElementById("recommendationsdiv").innerHTML = "";
 
     // chooses which map of courses (fall or spring) to use
+    // first, check whether on- or off-sequence
+    updatesequence();
     var coursesmap = fallclasses;
     var semester = "Fall";
     if (springsemesters.has(selectedsemester)) {
@@ -729,16 +769,34 @@
 
         var course = selectedrecommendations[i][j]; // course number
 
-        for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort()) {
-          // for the course in question (index j), steps through all sections
+        if (coursesections.has(semester + " " + dept + " " + course)) {
+          // only executes if at least 1 section of course is offered in given semester
+        
+          for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort()) {
+            // for the course in question (index j), steps through all sections
 
-          // populate the course's drop-down list with names
-          // names are generated from section numbers with prettyname(sectionnumber)
-          document.getElementById("selectrecommendation" + i).innerHTML = document.getElementById("selectrecommendation" + i).innerHTML + "<option value=" + section + ">" + prettyname(coursesmap.get(section)) + "</option>";
-
-        } // for loop (list of all available sections for given course)
+            // populate the course's drop-down list with names
+            // names are generated from section numbers with prettyname(sectionnumber)
+            document.getElementById("selectrecommendation" + i).innerHTML = document.getElementById("selectrecommendation" + i).innerHTML + "<option value=" + section + ">" + prettyname(coursesmap.get(section)) + "</option>";
+          
+          } // for loop (list of all available sections for given course)
+          
+        } // if statement (1+ sections of course offered in given semester)
 
       } // index j (options for recommended course)
+      
+      // if no sections of given course are offered in given semester, disable drop-down menu
+      // otherwise, ensure drop-down menu is enabled
+      if (document.getElementById("selectrecommendation" + i).length == 0) {
+        
+        document.getElementById("selectrecommendation" + i).disabled = true;
+        document.getElementById("selectrecommendation" + i).innerHTML = "<option value=\"\">[No sections offered in selected semester]</option>";
+        
+      } else {
+        
+        document.getElementById("selectrecommendation" + i).disabled = false;
+        
+      } // if statement (1+ sections offered in given semester)
 
     } // index i (list of recommended courses for given major and semester)
 
@@ -761,21 +819,26 @@
         var course = selectedrecommendations[i][j];
         //var nmodified = 0; // used as counter below
 
-        for (let k = Math.max(0, 2 - j); k < coursesections.get(semester + " " + dept + " " + course).size; k++) {
-          // for the course in question (index j), k counts the sections offered
-          // for each new section offered, repeat the list of existing sections
-          // no repetition is needed for first section, eg. skip k=0
-          //   but only when j=1! otherwise, appending to sections that meet current recommendation (remember j=0 is skipped to find dept name)
+        if (coursesections.has(semester + " " + dept + " " + course)) {
+          // only executes if at least 1 section of course is offered in given semester
 
-          for (let l = 0; l < ncombinations; l++) {
+          for (let k = Math.max(0, 2 - j); k < coursesections.get(semester + " " + dept + " " + course).size; k++) {
+            // for the course in question (index j), k counts the sections offered
+            // for each new section offered, repeat the list of existing sections
+            // no repetition is needed for first section, eg. skip k=0
+            //   but only when j=1! otherwise, appending to sections that meet current recommendation (remember j=0 is skipped to find dept name)
 
-            // to create a deep copy, unpack the elements of each array into a new array
-            //   ... is called "spread" notation
-            sectioncombinations.push([...sectioncombinations[l]]);
+            for (let l = 0; l < ncombinations; l++) {
 
-          } // index l (number of existing combinations)
+              // to create a deep copy, unpack the elements of each array into a new array
+              //   ... is called "spread" notation
+              sectioncombinations.push([...sectioncombinations[l]]);
 
-        } // index k (number of sections offered for new course)
+            } // index l (number of existing combinations)
+
+          } // index k (number of sections offered for new course)
+          
+        } // if statement (1+ sections of given course offered in given semester
 
       } // index j (options for recommended courses)
 
@@ -785,31 +848,36 @@
 
         // declare variables
         var course = selectedrecommendations[i][j];
+        
+        if (coursesections.has(semester + " " + dept + " " + course)) {
+          // only executes if at least 1 section of course is offered in given semester
 
-        for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort()) {
-          // for the course in question (index j), steps through all sections
+          for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort()) {
+            // for the course in question (index j), steps through all sections
 
-          if (i == 0) {
-            // for first recommended course, append one-element arrays of sections
+            if (i == 0) {
+              // for first recommended course, append one-element arrays of sections
 
-            sectioncombinations.push([section]);
+              sectioncombinations.push([section]);
 
-          } else {
+            } else {
 
-            for (let k = 0; k < ncombinations; k++) {
-              // pairs every existing combination with the new section
+              for (let k = 0; k < ncombinations; k++) {
+                // pairs every existing combination with the new section
 
-              sectioncombinations[nmodified + k].push(section);
+                sectioncombinations[nmodified + k].push(section);
 
-            } // index k (number of existing combinations)
+              } // index k (number of existing combinations)
 
-            // update number of combinations modified *after* modification finished
-            // otherwise, double-counted with nmodified + k
-            nmodified = nmodified + ncombinations;
+              // update number of combinations modified *after* modification finished
+              // otherwise, double-counted with nmodified + k
+              nmodified = nmodified + ncombinations;
 
-          } // if statement
+            } // if statement
 
-        } // for loop (list of all sections offered for course in question)
+          } // for loop (list of all sections offered for course in question)
+          
+        } // if statement (1+ sections of given course offered in given semester)
 
       } // index j (options for recommended course)
 
@@ -1139,7 +1207,7 @@
     }
     // when page loads and courses have been retrieved, show recommended courses for initial major and semester
     updaterecommendations();		
-  }      
+  } // return function from asynchronous json request
 
 </script>
 
