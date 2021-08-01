@@ -1119,15 +1119,18 @@
   } // function updaterecommendations()
   
   // just before page loads, retrieve list of courses
-  let requestURL = 'https://dhorenstein.github.io/sac-science-capacity/courses.json';
-  let request = new XMLHttpRequest();
-  request.open('GET', requestURL);
-  request.responseType = 'json';
-  request.send();
-  request.onload = function() {
-    const allcourses = request.response;
-    for (const course of allcourses) {
+  let requestURL = "https://dhorenstein.github.io/sac-science-capacity/courses.json";
+  let xmlhttp = new XMLHttpRequest();
+  xmlhttp.open("GET", requestURL);
+  xmlhttp.send();
+  xmlhttp.onload = function() {
+    const allcourses = JSON.parse(xmlhttp.responseText);
+    for (let course of allcourses) {
       // course structure: [semester, section number, [course info]]
+      // replace section number of -1 with nextindex()
+      if (course[1] == -1) {
+        course[1] = nextindex();
+      }
       if ((course[0] == "Fall") || (course[0] == "Intersession")) {
         fallclasses.set(course[1], course[2]); // key: section number; value: course info
       } else {
