@@ -16,7 +16,7 @@
   <p>Semester:
     <select id="selectsemester" onchange="updaterecommendations();">
     </select>
-    <span id="labelsemester">
+    <span id="labelsemester1">
     </span>
   </p>
 
@@ -85,6 +85,12 @@
   <p>Sunday:
   </p>
   <div id="schedule6div">
+  </div>
+
+  <p><span id="labelsemester2">
+  </span>
+  </p>
+  <div id="schedule7div">
   </div>
 
   <p>&nbsp;
@@ -377,11 +383,13 @@
     if (((selectedsemester % 2 == 1) && (document.getElementById("onsequenceradio").checked)) ||
         ((selectedsemester % 2 == 0) && (document.getElementById("offsequenceradio").checked))) {
       
-      document.getElementById("labelsemester").innerHTML = "Fall or Intersession";
+      document.getElementById("labelsemester1").innerHTML = "Fall or Intersession";
+      document.getElementById("labelsemester2").innerHTML = "Intersession"; // nonstandard "day" name
       
     } else {
       
-      document.getElementById("labelsemester").innerHTML = "Spring or Summer";
+      document.getElementById("labelsemester1").innerHTML = "Spring or Summer";
+      document.getElementById("labelsemester2").innerHTML = "Summer"; // nonstandard "day" name
             
     }
     
