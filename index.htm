@@ -808,7 +808,8 @@
     }
     for (let combination of sectioncombinations) {
 
-      var schedulearray = [[], [], [], [], [], [], []];
+      var schedulearray = [[], [], [], [], [], [], [], []]; // include index 7 for intersession/summer
+      // note that this schedulearray in updaterecommendations() is distinct from the one in updateschedule()
 
       for (let section of combination) {
 
