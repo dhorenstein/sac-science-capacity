@@ -848,7 +848,8 @@
 
       } // index i (day of week)
 
-      // update previousdayend if any course is schedule on sunday
+      // update previousdayend if any course is scheduled on sunday
+      // will be updated each day after checking for long schedule, around line 929
       if (schedulearray[6].length > 0) {
         // do NOT update index to 7 to include intersession/summer courses, which will meet in the subsequent semester
 
@@ -861,7 +862,7 @@
 
           } // if statement
 
-        } // index i (day of week)
+        } // index i (each course scheduled on sunday)
         
       } // if statement
 
@@ -905,7 +906,6 @@
 
         if ((!conflictfound) && (schedulearray[i].length > 0)) {
           // only check for long day if at least one class and no schedule conflicts
-          // come back to this when adding intersession/summer
 
           var firststart = schedulearray[i][0][0]; // first start time on that day
           var lastend = schedulearray[i][schedulearray[i].length - 1][1]; // last end time on that day
