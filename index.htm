@@ -334,6 +334,8 @@
   dayofweek.set(4, "F")
   dayofweek.set(5, "S")
   dayofweek.set(6, "U")
+  dayofweek.set(7, "X") // can be intersession or summer
+  // online not needed since time of day irrelevant
 
   // maps majors (in order of majors array) from name to number, indexed at 0
   let majorcolumns = new Map();
@@ -553,8 +555,8 @@
         for (let j = 0; j < (courseinfo.length - 2) / 3; j++) {
           // steps through every course component (every set of day, start, end)
 
-          for (let k = 0; k < 7; k++) {
-            // steps through days of week
+          for (let k = 0; k < 8; k++) {
+            // steps through days of week, including intersession/summer
 
             if (courseinfo[j * 3 + 2].indexOf(dayofweek.get(k)) >= 0) {
               // executes if the day letter is in the course component day, ex. "M" in "MW"
@@ -574,8 +576,8 @@
 
     } // index i (user-selected section)
 
-    for (let i = 0; i < 7; i++) {
-      // steps through days of week
+    for (let i = 0; i < 8; i++) {
+      // steps through days of week, including intersession/summer
 
       // clear that day's on-screen schedule
       document.getElementById("schedule" + i + "div").innerHTML = "<p>";
@@ -815,8 +817,8 @@
         for (let i = 0; i < (courseinfo.length - 2) / 3; i++) {
           // steps through every course component (every set of day, start, end)
 
-          for (let j = 0; j < 7; j++) {
-            // steps through days of week
+          for (let j = 0; j < 8; j++) {
+            // steps through days of week, including intersession/summer
 
             if (courseinfo[i * 3 + 2].indexOf(dayofweek.get(j)) >= 0) {
               // executes if day letter is in course component day, ex. "M" in "MW"
@@ -837,8 +839,8 @@
       var conflictfound = false;
       var longdayfound = false;
       var previousdayend = 1; // initial value 12:01 AM on Sunday before week starts
-      for (let i = 0; i < 7; i++) {
-        // steps through days of week
+      for (let i = 0; i < 8; i++) {
+        // steps through days of week, including intersession/summer
 
         // sort that day's schedule by start time
         // (later - const) will be larger than (earlier - const) is
@@ -848,6 +850,7 @@
 
       // update previousdayend if any course is schedule on sunday
       if (schedulearray[6].length > 0) {
+        // do NOT update index to 7 to include intersession/summer courses, which will meet in the subsequent semester
 
         for (let i = 0; i < schedulearray[6].length; i++) {
           // steps through every course scheduled for that day
@@ -862,8 +865,8 @@
         
       } // if statement
 
-      for (let i = 0; i < 7; i++) {
-        // steps through days of week
+      for (let i = 0; i < 8; i++) {
+        // steps through days of week, including intersession/summer
 
         for (let j = 0; j < schedulearray[i].length; j++) {
           // steps through every course scheduled for that day
@@ -902,6 +905,7 @@
 
         if ((!conflictfound) && (schedulearray[i].length > 0)) {
           // only check for long day if at least one class and no schedule conflicts
+          // come back to this when adding intersession/summer
 
           var firststart = schedulearray[i][0][0]; // first start time on that day
           var lastend = schedulearray[i][schedulearray[i].length - 1][1]; // last end time on that day
@@ -1139,9 +1143,9 @@
 
         } // if statement
 
-      } // for loop of all fall classes
+      } // for loop of all fall OR spring classes
 
-    } // for loop (to cover fall and spring semesters)
+    } // for loop (to cover fall AND spring semesters)
     
     // when page loads and courses have been retrieved, show recommended courses for initial major and semester
     updaterecommendations();
