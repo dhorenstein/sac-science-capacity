@@ -363,7 +363,7 @@
   dayofweek.set(7, "X") // can be intersession or summer
   dayofweek.set(8, "O") // online asynchronous
   dayofweek.set(9, "P") // online asynchronous in intersession or summer
-
+  
   // maps majors (in order of majors array) from name to number, indexed at 0
   let majorcolumns = new Map();
   for (let i = 0; i < majors.length; i++) {
@@ -786,6 +786,22 @@
               var course1 = coursesmap.get(section1);
               var course2 = coursesmap.get(section2);
               for (let k = 0; k < Math.min(course1.length, course2.length); k++) {
+                if ((k + 1) % 3 == 0) { // days of week when class meets
+                  var daystring1 = section1[k];
+                  var daystring2 = section2[k];
+                  for (let l = 0; l < dayofweek.size; l++) {
+                    daystring1 = daystring1.replace(dayofweek.get(l), l);
+                    daystring2 = daystring2.replace(dayofweek.get(l), l);
+                    // examples: "M" becomes "0", "MW" becomes "02"
+                  } // index l (day of week)
+                  if daystring1 < daystring2 {
+                    return -1;
+                  }
+                  if daystring1 > daystring2 {
+                    return 1;
+                  }
+                }
+                // if course info element is department, course, start time, or end time, check next two if statements
                 if (course1[k] < course2[k]) {
                   return -1;
                 }
@@ -794,6 +810,7 @@
                 }
                 // loop iterates if element of course info is identical in both courses
               } // index k (element of course info, limited to number of elements of course with fewest elements)
+              // if no more elements in one course, select course with fewest elements and hence shortest name
               if (course1.length < course2.length) {
                 return -1;
               }
