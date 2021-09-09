@@ -50,8 +50,9 @@
   <p>&nbsp;
   </p>
 
-  <p><strong>Weekly schedule from selected sections, with hard conflicts shown in <span style="color: red;">red</span>
-    and quick turn-arounds shown in <span style="color: teal;">teal</span></strong>:
+  <p><strong>Weekly schedule from selected sections, with hard conflicts shown in <span style="color: red;">red</span>,
+    turn-arounds less than 12 hours shown in <span style="color: teal;">teal</span>, and
+    days longer than 10 hours shown in <span style="color: navy;">navy</span></strong>:
   </p>
 
   <p>Monday:
@@ -692,7 +693,16 @@
 
         var colorstr = "black";
         var starttime = schedulearray[i][j][0];
+        var endtime = schedulearray[i][j][1];
+        var firststarttime = schedulearray[i][0][0];
         if (i < 8) { // don't check whether online courses overlap, but do check intersession/summer
+          
+          if (endtime > (firststarttime + 1000)) {
+            // if the current end time is more than 10 hours after the first course's start time
+
+            colorstr = "navy";
+
+          } // if statement (use navy font)
 
           for (let k = 0; k < j; k++) {
             // steps through all courses that begin earlier than the current course does
@@ -716,7 +726,7 @@
           
           var previousdeparturetime = schedulearray[(i + 6) % 7][schedulearray[(i + 6) % 7].length - 1][1]
           if (starttime < (previousdeparturetime + 1200 - 2400)) {
-            // if the current start time is before any previous course's end time
+            // if the current start time is less than 12 hours after the previous day's end time
 
             colorstr = "teal";
 
