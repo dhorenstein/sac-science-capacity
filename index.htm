@@ -40,7 +40,8 @@
   <p>&nbsp;
   </p>
 
-  <p><strong>Recommended courses and available sections:</strong>
+  <p><strong>Recommended courses and available sections in <span id="labelsemester4">
+    </span>:</strong>
   </p>
 
   <div id="recommendationsdiv">
@@ -95,7 +96,13 @@
 
   <p>Online:
   </p>
-  <div id="schedule6div">
+  <div id="schedule8div">
+  </div>
+  
+  <p><span id="labelsemester3">
+  </span>:
+  </p>
+  <div id="schedule9div">
   </div>
   
   <p>&nbsp;
@@ -355,6 +362,7 @@
   dayofweek.set(6, "U")
   dayofweek.set(7, "X") // can be intersession or summer
   dayofweek.set(8, "O") // online asynchronous
+  dayofweek.set(9, "P") // online asynchronous in intersession or summer
 
   // maps majors (in order of majors array) from name to number, indexed at 0
   let majorcolumns = new Map();
@@ -398,11 +406,15 @@
       
       document.getElementById("labelsemester1").innerHTML = "Fall or Intersession";
       document.getElementById("labelsemester2").innerHTML = "Intersession"; // nonstandard "day" name
+      document.getElementById("labelsemester3").innerHTML = "Online Intersession"; // nonstandard "day" name
+      document.getElementById("labelsemester4").innerHTML = "Fall or Intersession";
       
     } else {
       
       document.getElementById("labelsemester1").innerHTML = "Spring or Summer";
       document.getElementById("labelsemester2").innerHTML = "Summer"; // nonstandard "day" name
+      document.getElementById("labelsemester3").innerHTML = "Online Summer"; // nonstandard "day" name
+      document.getElementById("labelsemester4").innerHTML = "Spring or Summer";
             
     }
     
@@ -486,12 +498,24 @@
     for (let i = 0; i < (courseinfo.length - 2) / 3; i++) {
       // steps through every course component (every set of day, start, end)
 
+      var selectedsemester = document.getElementById("selectsemester").value;
       switch(courseinfo[i * 3 + 2]) {
         case "O":
           displayname = displayname + "Online";
           break;
+        case "P":
+          if (((selectedsemester % 2 == 1) && (document.getElementById("onsequenceradio").checked)) ||
+              ((selectedsemester % 2 == 0) && (document.getElementById("offsequenceradio").checked))) {
+            
+            displayname = displayname + "Online Intersession";
+            
+          } else {
+            
+            displayname = displayname + "Online Summer";
+            
+          }
+          break;
         case "X":
-          var selectedsemester = document.getElementById("selectsemester").value;
           if (((selectedsemester % 2 == 1) && (document.getElementById("onsequenceradio").checked)) ||
               ((selectedsemester % 2 == 0) && (document.getElementById("offsequenceradio").checked))) {
 
@@ -566,9 +590,10 @@
     // declare variables
     var selectedsemester = document.getElementById("selectsemester").value;
     var selectedclasses = document.getElementsByTagName("select");
-    var schedulearray = [[], [], [], [], [], [], [], [], []];
+    var schedulearray = [[], [], [], [], [], [], [], [], [], []];
     // include index 7 for intersession/summer
     // include index 8 for online
+    // include index 9 for online intersession/summer
 
     // chooses which map of courses (fall or spring) to use
     var coursesmap = fallclasses;
@@ -593,8 +618,8 @@
         for (let j = 0; j < (courseinfo.length - 2) / 3; j++) {
           // steps through every course component (every set of day, start, end)
 
-          for (let k = 0; k < 8; k++) {
-            // steps through days of week, including intersession/summer
+          for (let k = 0; k < 10; k++) {
+            // steps through days of week, including intersession/summer and online intersession/summer
 
             if (courseinfo[j * 3 + 2].indexOf(dayofweek.get(k)) >= 0) {
               // executes if the day letter is in the course component day, ex. "M" in "MW"
@@ -602,12 +627,24 @@
               // names the course component, ex. "PHYS 217 M 8:35 AM - 11:45 AM"
               // lecture and lab named separately due to index j loop
               // adds course component name to that day's schedule (from index k)
+              var selectedsemester = document.getElementById("selectsemester").value;
               switch(courseinfo[j * 3 + 2]) {
                 case "O":
                   schedulearray[k].push([courseinfo[j * 3 + 3], courseinfo[j * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " Online"]); // start, end, name
                   break;
+                case "P":
+                  if (((selectedsemester % 2 == 1) && (document.getElementById("onsequenceradio").checked)) ||
+                      ((selectedsemester % 2 == 0) && (document.getElementById("offsequenceradio").checked))) {
+                    
+                    schedulearray[k].push([courseinfo[j * 3 + 3], courseinfo[j * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " Online Intersession"]); // start, end, name
+                    
+                  } else {
+                    
+                    schedulearray[k].push([courseinfo[j * 3 + 3], courseinfo[j * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " Online Summer"]); // start, end, name
+                    
+                  }
+                  break;
                 case "X":
-                  var selectedsemester = document.getElementById("selectsemester").value;
                   if (((selectedsemester % 2 == 1) && (document.getElementById("onsequenceradio").checked)) ||
                       ((selectedsemester % 2 == 0) && (document.getElementById("offsequenceradio").checked))) {
 
@@ -634,7 +671,7 @@
     } // index i (user-selected section)
 
     for (let i = 0; i < 8; i++) {
-      // steps through days of week, including intersession/summer
+      // steps through days of week, including intersession/summer but not online
 
       // clear that day's on-screen schedule
       document.getElementById("schedule" + i + "div").innerHTML = "<p>";
@@ -865,9 +902,10 @@
     }
     for (let combination of sectioncombinations) {
 
-      var schedulearray = [[], [], [], [], [], [], [], [], []];
+      var schedulearray = [[], [], [], [], [], [], [], [], [], []];
       // include index 7 for intersession/summer
       // include index 8 for online
+      // include index 9 for online intersession/summer
       // note that this schedulearray in updaterecommendations() is distinct from the one in updateschedule()
 
       for (let section of combination) {
@@ -877,8 +915,8 @@
         for (let i = 0; i < (courseinfo.length - 2) / 3; i++) {
           // steps through every course component (every set of day, start, end)
 
-          for (let j = 0; j < 8; j++) {
-            // steps through days of week, including intersession/summer
+          for (let j = 0; j < 10; j++) {
+            // steps through days of week, including intersession/summer and online intersession/summer
 
             if (courseinfo[i * 3 + 2].indexOf(dayofweek.get(j)) >= 0) {
               // executes if day letter is in course component day, ex. "M" in "MW"
@@ -886,12 +924,24 @@
               // names the course component, ex. "PHYS 217 M 8:35 AM - 11:45 AM"
               // lecture and lab named separately due to index j loop
               // adds course component name to that day's schedule (from index j)
+              var selectedsemester = document.getElementById("selectsemester").value;
               switch(courseinfo[i * 3 + 2]) {
                 case "O":
                   schedulearray[j].push([courseinfo[i * 3 + 3], courseinfo[i * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " Online"]); // start, end, name
                   break;
+                case "P":
+                  if (((selectedsemester % 2 == 1) && (document.getElementById("onsequenceradio").checked)) ||
+                      ((selectedsemester % 2 == 0) && (document.getElementById("offsequenceradio").checked))) {
+                    
+                    schedulearray[j].push([courseinfo[i * 3 + 3], courseinfo[i * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " Online Intersession"]); // start, end, name
+                    
+                  } else {
+                    
+                    schedulearray[j].push([courseinfo[i * 3 + 3], courseinfo[i * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " Online Summer"]); // start, end, name
+                    
+                  }
+                  break;
                 case "X":
-                  var selectedsemester = document.getElementById("selectsemester").value;
                   if (((selectedsemester % 2 == 1) && (document.getElementById("onsequenceradio").checked)) ||
                       ((selectedsemester % 2 == 0) && (document.getElementById("offsequenceradio").checked))) {
 
@@ -919,7 +969,7 @@
       var longdayfound = false;
       var previousdayend = 1; // initial value 12:01 AM on Sunday before week starts
       for (let i = 0; i < 8; i++) {
-        // steps through days of week, including intersession/summer
+        // steps through days of week, including intersession/summer but not online
 
         // sort that day's schedule by start time
         // (later - const) will be larger than (earlier - const) is
@@ -946,7 +996,7 @@
       } // if statement
 
       for (let i = 0; i < 8; i++) {
-        // steps through days of week, including intersession/summer
+        // steps through days of week, including intersession/summer but not online
 
         for (let j = 0; j < schedulearray[i].length; j++) {
           // steps through every course scheduled for that day
@@ -1153,7 +1203,7 @@
         singularcase(ncombinations, "these") + " " +
         singularcase(ncombinations, "combinations") + ", " +
         nconflictedschedules + "&nbsp;(" + fractionconflicted + "%) " +
-        singularcase(ncombinations, "are") + " not possible due to scheduling conflicts. These conflicts are listed at the bottom of this page.</p>" +
+        singularcase(ncombinations, "are") + " not possible due to scheduling conflicts. These conflicts are listed at the bottom of this page. A large number of combinations coupled with a large percentage of possible conflicts may be frustrating for students.</p>" +
         "<p>The following criteria are used to assess whether any given combination is reasonable.</p><ul>" +
         "<li><p>A student should not have to be on campus for more than 10&nbsp;hours a day on any day of the week.</p></li>" +
         "<li><p>A student should not have to return to campus fewer than 12&nbsp;hours after his or her last class from the previous day.</p></li>" +
