@@ -50,7 +50,8 @@
   <p>&nbsp;
   </p>
 
-  <p><strong>Weekly schedule from selected sections, with conflicts shown in <span style="color: red;">red</span></strong>:
+  <p><strong>Weekly schedule from selected sections, with hard conflicts shown in <span style="color: red;">red</span></strong>
+    and quick turn-arounds shown in <span style="color: teal;">teal</span></strong>:
   </p>
 
   <p>Monday:
@@ -670,15 +671,22 @@
 
     } // index i (user-selected section)
 
+    // before populating daily schedules, sort each day's schedule
+    for (let i = 0; i < 10; i++) {
+      // steps through days of week, including intersession/summer and online intersession/summer
+      
+      // sort each day's schedule by start time
+      // (later - const) will be larger than (earlier - const) is
+      schedulearray[i].sort((class1, class2) => class1[0] - class2[0]);
+
+    } // index i (day of week)
+    
     for (let i = 0; i < 10; i++) {
       // steps through days of week, including intersession/summer and online intersession/summer
 
       // clear that day's on-screen schedule
       document.getElementById("schedule" + i + "div").innerHTML = "<p>";
 
-      // sort that day's schedule by start time
-      // (later - const) will be larger than (earlier - const) is
-      schedulearray[i].sort((class1, class2) => class1[0] - class2[0]);
       for (let j = 0; j < schedulearray[i].length; j++) {
         // steps through every course scheduled for that day
 
@@ -688,8 +696,9 @@
 
           for (let k = 0; k < j; k++) {
             // steps through all courses that begin earlier than the current course does
+            // doesn't execute when j = 0
 
-            previousendtime = schedulearray[i][k][1];
+            var previousendtime = schedulearray[i][k][1];
             if (starttime < previousendtime) {
               // if the current start time is before any previous course's end time
 
@@ -697,9 +706,21 @@
 
             } // if statement (use red font)
           
-          } // if statement (only check monday - sunday, plus intersession/summer)
+          } // index k (all courses that began earlier in day)
+          
+        } // if statement (only check monday - sunday, plus intersession/summer)
+        
+        if ((j == 0) && (i < 7)) { // only check first class of the day, and only check monday - sunday
+          
+          var previousdeparturetime = schedulearray[(i + 6) % 7][schedulearray[(i + 6) % 7].length - 1][1]
+          if (starttime < (previousdeparturetime + 1200 - 2400)) {
+            // if the current start time is before any previous course's end time
 
-        } // index k (all courses that began earlier in day)
+            colorstr = "teal";
+
+          } // if statement (use teal font)
+          
+        } // if statement (only check first class of the day, monday - sunday)
 
         // show course name in that day's on-screen schedule
         // use red text if current course conflicts with any earlier course
@@ -1047,7 +1068,7 @@
           for (let k = 0; k < j; k++) {
             // steps through all courses that begin earlier than the current course does
 
-            previousendtime = schedulearray[i][k][1];
+            var previousendtime = schedulearray[i][k][1];
             if (starttime < previousendtime) {
               // if the current start time is before any previous course's end time
 
