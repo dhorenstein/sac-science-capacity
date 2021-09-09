@@ -787,8 +787,8 @@
               var course2 = coursesmap.get(section2);
               for (let k = 0; k < Math.min(course1.length, course2.length); k++) {
                 if ((k + 1) % 3 == 0) { // days of week when class meets
-                  var daystring1 = section1[k];
-                  var daystring2 = section2[k];
+                  var daystring1 = course1[k];
+                  var daystring2 = course2[k];
                   for (let l = 0; l < dayofweek.size; l++) {
                     daystring1 = daystring1.replace(dayofweek.get(l), l);
                     daystring2 = daystring2.replace(dayofweek.get(l), l);
