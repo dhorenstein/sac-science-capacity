@@ -1236,6 +1236,7 @@
   } // function updaterecommendations()
   
   // just before page loads, retrieve list of courses
+  // use section number -1 to assign the next available section number to a modified course
   let requestURL = "https://dhorenstein.github.io/sac-science-capacity/courses.json";
   let xmlhttp = new XMLHttpRequest();
   xmlhttp.open("GET", requestURL);
