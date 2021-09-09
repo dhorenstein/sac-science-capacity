@@ -491,16 +491,17 @@
           displayname = displayname + "Online";
           break;
         case "X":
-           if (((selectedsemester % 2 == 1) && (document.getElementById("onsequenceradio").checked)) ||
-               ((selectedsemester % 2 == 0) && (document.getElementById("offsequenceradio").checked))) {
+          var selectedsemester = document.getElementById("selectsemester").value;
+          if (((selectedsemester % 2 == 1) && (document.getElementById("onsequenceradio").checked)) ||
+              ((selectedsemester % 2 == 0) && (document.getElementById("offsequenceradio").checked))) {
 
-             displayname = displayname + "Intersession " + formattime(courseinfo[i * 3 + 3]) + " - " + formattime(courseinfo[i * 3 + 4]);
+            displayname = displayname + "Intersession " + formattime(courseinfo[i * 3 + 3]) + " - " + formattime(courseinfo[i * 3 + 4]);
              
-           } else {
+          } else {
 
-             displayname = displayname + "Summer " + formattime(courseinfo[i * 3 + 3]) + " - " + formattime(courseinfo[i * 3 + 4]);
+            displayname = displayname + "Summer " + formattime(courseinfo[i * 3 + 3]) + " - " + formattime(courseinfo[i * 3 + 4]);
 
-           }
+          }
           break;
         default:
           displayname = displayname + courseinfo[i * 3 + 2] + " " + formattime(courseinfo[i * 3 + 3]) + " - " + formattime(courseinfo[i * 3 + 4]);
