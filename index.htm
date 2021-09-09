@@ -817,7 +817,7 @@
               if (course1.legnth > course2.length) {
                 return 1;
               }
-              // otherwise, courses are identical, which shouldn't happen, but all possibilities need a sort value
+              // otherwise, courses are identical, which can happen if multiple sections are offered simultaneously
               return 0;
             })) {
             // for the course in question (index j), steps through all sections
