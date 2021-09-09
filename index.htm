@@ -794,10 +794,10 @@
                     daystring2 = daystring2.replace(dayofweek.get(l), l);
                     // examples: "M" becomes "0", "MW" becomes "02"
                   } // index l (day of week)
-                  if daystring1 < daystring2 {
+                  if (daystring1 < daystring2) {
                     return -1;
                   }
-                  if daystring1 > daystring2 {
+                  if (daystring1 > daystring2) {
                     return 1;
                   }
                 }
