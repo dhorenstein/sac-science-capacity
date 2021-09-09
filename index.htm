@@ -566,7 +566,9 @@
     // declare variables
     var selectedsemester = document.getElementById("selectsemester").value;
     var selectedclasses = document.getElementsByTagName("select");
-    var schedulearray = [[], [], [], [], [], [], [], []]; // include index 7 for intersession/summer
+    var schedulearray = [[], [], [], [], [], [], [], [], []];
+    // include index 7 for intersession/summer
+    // include index 8 for online
 
     // chooses which map of courses (fall or spring) to use
     var coursesmap = fallclasses;
@@ -600,7 +602,7 @@
               // names the course component, ex. "PHYS 217 M 8:35 AM - 11:45 AM"
               // lecture and lab named separately due to index j loop
               // adds course component name to that day's schedule (from index k)
-              switch(courseinfo[i * 3 + 2]) {
+              switch(courseinfo[j * 3 + 2]) {
                 case "O":
                   schedulearray[k].push([courseinfo[j * 3 + 3], courseinfo[j * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " Online"]); // start, end, name
                   break;
@@ -863,7 +865,9 @@
     }
     for (let combination of sectioncombinations) {
 
-      var schedulearray = [[], [], [], [], [], [], [], []]; // include index 7 for intersession/summer
+      var schedulearray = [[], [], [], [], [], [], [], [], []];
+      // include index 7 for intersession/summer
+      // include index 8 for online
       // note that this schedulearray in updaterecommendations() is distinct from the one in updateschedule()
 
       for (let section of combination) {
