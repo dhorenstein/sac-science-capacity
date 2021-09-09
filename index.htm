@@ -782,11 +782,23 @@
         if (coursesections.has(semester + " " + dept + " " + course)) {
           // only executes if at least 1 section of course is offered in given semester
         
-          for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort((section1, section2) => prettyname(coursesmap.get(section2)) - prettyname(coursesmap.get(section1)))) {
+          for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort(function(section1, section2) {
+              var course1 = prettyname(coursesmap.get(section1));
+              var course2 = prettyname(coursesmap.get(section2));
+              if (course1 < course2) {
+                return -1;
+              }
+              if (course1 > course2) {
+                return 1;
+              }
+              // otherwise, names are identical
+              return 0;
+            })) {
             // for the course in question (index j), steps through all sections
+            // pre-sort the sections by their display names from prettyname()
 
             // populate the course's drop-down list with names
-            // names are generated from section numbers with prettyname(sectionnumber)
+            // names are generated from section numbers with prettyname()
             document.getElementById("selectrecommendation" + i).innerHTML = document.getElementById("selectrecommendation" + i).innerHTML + "<option value=" + section + ">" + prettyname(coursesmap.get(section)) + "</option>";
           
           } // for loop (list of all available sections for given course)
