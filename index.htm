@@ -423,17 +423,13 @@
 
           let dept = recommendations[i][j][k][0];
           let course = recommendations[i][j][k][l];
-          if ((j == 0) || (j == 2)) {
+          for (let semestertype of ["Fall", "Spring"]) { // need both to accommodate off-sequence
 
-            key = "Fall " + dept + " " + course;
-
-          } else {
-
-            key = "Spring " + dept + " " + course;
-
-          } // if statement
-          coursesections.set(key, new Set());
-          recommendedcoursekeys.add(key);
+            key = semestertype + " " + dept + " " + course;
+            coursesections.set(key, new Set());
+            recommendedcoursekeys.add(key);
+            
+          } // for loop (populate both fall and spring courses)
 
         } // index l (option)
 
