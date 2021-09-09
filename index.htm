@@ -93,6 +93,11 @@
   <div id="schedule7div">
   </div>
 
+  <p>Online:
+  </p>
+  <div id="schedule6div">
+  </div>
+  
   <p>&nbsp;
   </p>
 
@@ -349,7 +354,7 @@
   dayofweek.set(5, "S")
   dayofweek.set(6, "U")
   dayofweek.set(7, "X") // can be intersession or summer
-  // online not needed since time of day irrelevant
+  dayofweek.set(8, "O") // online asynchronous
 
   // maps majors (in order of majors array) from name to number, indexed at 0
   let majorcolumns = new Map();
@@ -481,7 +486,25 @@
     for (let i = 0; i < (courseinfo.length - 2) / 3; i++) {
       // steps through every course component (every set of day, start, end)
 
-      displayname = displayname + courseinfo[i * 3 + 2] + " " + formattime(courseinfo[i * 3 + 3]) + " - " + formattime(courseinfo[i * 3 + 4]);
+      switch(courseinfo[i * 3 + 2]) {
+        case "O":
+          displayname = displayname + "Online";
+          break;
+        case "X":
+           if (((selectedsemester % 2 == 1) && (document.getElementById("onsequenceradio").checked)) ||
+               ((selectedsemester % 2 == 0) && (document.getElementById("offsequenceradio").checked))) {
+
+             displayname = displayname + "Intersession " + formattime(courseinfo[i * 3 + 3]) + " - " + formattime(courseinfo[i * 3 + 4]);
+             
+           } else {
+
+             displayname = displayname + "Summer " + formattime(courseinfo[i * 3 + 3]) + " - " + formattime(courseinfo[i * 3 + 4]);
+
+           }
+          break;
+        default:
+          displayname = displayname + courseinfo[i * 3 + 2] + " " + formattime(courseinfo[i * 3 + 3]) + " - " + formattime(courseinfo[i * 3 + 4]);
+      } // switch case
       if (i + 1 < (courseinfo.length - 2) / 3) {
 
         displayname = displayname + " and ";
