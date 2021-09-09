@@ -669,10 +669,9 @@
       } // if statement (is 1+ section offered?)
 
     } // index i (user-selected section)
-    console.log(schedulearray);
 
-    for (let i = 0; i < 8; i++) {
-      // steps through days of week, including intersession/summer but not online
+    for (let i = 0; i < 10; i++) {
+      // steps through days of week, including intersession/summer and online intersession/summer
 
       // clear that day's on-screen schedule
       document.getElementById("schedule" + i + "div").innerHTML = "<p>";
@@ -685,16 +684,20 @@
 
         var colorstr = "black";
         var starttime = schedulearray[i][j][0];
-        for (let k = 0; k < j; k++) {
-          // steps through all courses that begin earlier than the current course does
+        if (i < 8) { // don't check whether online courses overlap, but do check intersession/summer
 
-          previousendtime = schedulearray[i][k][1];
-          if (starttime < previousendtime) {
-            // if the current start time is before any previous course's end time
+          for (let k = 0; k < j; k++) {
+            // steps through all courses that begin earlier than the current course does
 
-            colorstr = "red";
+            previousendtime = schedulearray[i][k][1];
+            if (starttime < previousendtime) {
+              // if the current start time is before any previous course's end time
 
-          } // if statement
+              colorstr = "red";
+
+            } // if statement (use red font)
+          
+          } // if statement (only check monday - sunday, plus intersession/summer)
 
         } // index k (all courses that began earlier in day)
 
