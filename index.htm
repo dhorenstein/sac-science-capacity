@@ -783,19 +783,28 @@
           // only executes if at least 1 section of course is offered in given semester
         
           for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort(function(section1, section2) {
-              var course1 = prettyname(coursesmap.get(section1));
-              var course2 = prettyname(coursesmap.get(section2));
-              if (course1 < course2) {
+              var course1 = coursesmap.get(section1);
+              var course2 = coursesmap.get(section2);
+              for (let k = 0; k < Math.min(course1.length, course2.length); k++) {
+                if (course1[k] < course2[k]) {
+                  return -1;
+                }
+                if (course1[k] > course2[k]) {
+                  return 1;
+                }
+                // loop iterates if element of course info is identical in both courses
+              } // index k (element of course info, limited to number of elements of course with fewest elements)
+              if (course1.length < course2.length) {
                 return -1;
               }
-              if (course1 > course2) {
+              if (course1.legnth > course2.length) {
                 return 1;
               }
-              // otherwise, names are identical
+              // otherwise, courses are identical, which shouldn't happen, but all possibilities need a sort value
               return 0;
             })) {
             // for the course in question (index j), steps through all sections
-            // pre-sort the sections by their display names from prettyname()
+            // custom sort order based on eventual display names
 
             // populate the course's drop-down list with names
             // names are generated from section numbers with prettyname()
