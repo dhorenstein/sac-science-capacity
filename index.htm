@@ -600,7 +600,26 @@
               // names the course component, ex. "PHYS 217 M 8:35 AM - 11:45 AM"
               // lecture and lab named separately due to index j loop
               // adds course component name to that day's schedule (from index k)
-              schedulearray[k].push([courseinfo[j * 3 + 3], courseinfo[j * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " " + courseinfo[j * 3 + 2] + " " + formattime(courseinfo[j * 3 + 3]) + " - " + formattime(courseinfo[j * 3 + 4])]); // start, end, name
+              switch(courseinfo[i * 3 + 2]) {
+                case "O":
+                  schedulearray[k].push([courseinfo[j * 3 + 3], courseinfo[j * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " Online"]); // start, end, name
+                  break;
+                case "X":
+                  var selectedsemester = document.getElementById("selectsemester").value;
+                  if (((selectedsemester % 2 == 1) && (document.getElementById("onsequenceradio").checked)) ||
+                      ((selectedsemester % 2 == 0) && (document.getElementById("offsequenceradio").checked))) {
+
+                    schedulearray[k].push([courseinfo[j * 3 + 3], courseinfo[j * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " Intersession " + formattime(courseinfo[j * 3 + 3]) + " - " + formattime(courseinfo[j * 3 + 4])]); // start, end, name
+             
+                  } else {
+
+                    schedulearray[k].push([courseinfo[j * 3 + 3], courseinfo[j * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " Summer " + formattime(courseinfo[j * 3 + 3]) + " - " + formattime(courseinfo[j * 3 + 4])]); // start, end, name
+
+                  }
+                  break;
+                default:
+                  schedulearray[k].push([courseinfo[j * 3 + 3], courseinfo[j * 3 + 4], courseinfo[0] + " " + courseinfo[1] + " " + courseinfo[j * 3 + 2] + " " + formattime(courseinfo[j * 3 + 3]) + " - " + formattime(courseinfo[j * 3 + 4])]); // start, end, name
+              } // switch case
 
             } // if statement
 
