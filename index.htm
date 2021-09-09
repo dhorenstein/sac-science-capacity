@@ -50,7 +50,7 @@
   <p>&nbsp;
   </p>
 
-  <p><strong>Weekly schedule from selected sections, with hard conflicts shown in <span style="color: red;">red</span></strong>
+  <p><strong>Weekly schedule from selected sections, with hard conflicts shown in <span style="color: red;">red</span>
     and quick turn-arounds shown in <span style="color: teal;">teal</span></strong>:
   </p>
 
@@ -710,7 +710,9 @@
           
         } // if statement (only check monday - sunday, plus intersession/summer)
         
-        if ((j == 0) && (i < 7)) { // only check first class of the day, and only check monday - sunday
+        if ((j == 0) && (i < 7) &&
+            (schedulearray[(i + 6) % 7].length > 0)) { // only check first class of the day, and only check monday - sunday
+          // only check turn-around time if there was at least one class on the previous day
           
           var previousdeparturetime = schedulearray[(i + 6) % 7][schedulearray[(i + 6) % 7].length - 1][1]
           if (starttime < (previousdeparturetime + 1200 - 2400)) {
