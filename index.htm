@@ -1208,7 +1208,7 @@
         singularcase(ncombinations, "combinations") + ", " +
         nconflictedschedules + "&nbsp;(" + fractionconflicted + "%) " +
         singularcase(ncombinations, "are") + " not possible due to scheduling conflicts. These conflicts are listed at the bottom of this page. " +
-        "A large number of schedule combinations coupled with a large percentage of possible conflicts may be frustrating for students.</p>" +
+        "If this metric is large, students may get frustrated when they they to build schedules for this program.</p>" +
         "<p>The following criteria are used to assess whether any given combination is reasonable.</p><ul>" +
         "<li><p>A student should not have to be on campus for more than 10&nbsp;hours a day on any day of the week.</p></li>" +
         "<li><p>A student should not have to return to campus fewer than 12&nbsp;hours after his or her last class from the previous day.</p></li>" +
@@ -1216,7 +1216,8 @@
         singularcase(npossible, "combinations") + " that " +
         singularcase(npossible, "are") + " possible, " +
         nlongdays + "&nbsp;(" + fractionlong + "%) " +
-        singularcase(nlongdays, "do") + " not meet the above criteria for a reasonable schedule.</p>" +
+        singularcase(nlongdays, "do") + " not meet the above criteria for a reasonable schedule. " +
+        "If this metric is large, students may feel pressured to choose schedules that do not prioritize their mental health.</p>" +
         "<p>Accounting for overlapping combinations and assuming a typical class size of 30&nbsp;students, the remaining " +
         (npossible - nlongdays) + "&nbsp;reasonable " +
         singularcase((npossible - nlongdays), "schedules") +
