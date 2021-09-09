@@ -782,7 +782,7 @@
         if (coursesections.has(semester + " " + dept + " " + course)) {
           // only executes if at least 1 section of course is offered in given semester
         
-          for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort((course1, course2) => prettyname(course2) - prettyname(course1))) {
+          for (let section of Array.from(coursesections.get(semester + " " + dept + " " + course)).sort((section1, section2) => prettyname(coursesmap.get(section2)) - prettyname(coursesmap.get(section1)))) {
             // for the course in question (index j), steps through all sections
 
             // populate the course's drop-down list with names
